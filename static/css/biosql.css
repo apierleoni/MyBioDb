@@ -1,0 +1,265 @@
+.unitview-header {
+    text-align: left;
+    border-bottom: 1px solid #444;
+    
+    margin-top: 1em;
+}
+.unitview-title {
+    padding-left: 0.5em;
+}
+.unitview-time {
+    float: left;
+    text-align: right;
+    width: 50px;
+    height: 40px;
+    font-size: 24px;
+    padding-right: 10px;
+    border-right: 1px solid white;
+    margin-right:  0.5em;
+    /*background-color: #e1e1e1;*/
+
+}
+.unitview-year {
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+    width: 40px;
+    line-height: 18px;
+    margin: 12px 0 0 -7px;
+    display: block;
+    transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    -moz-transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+}
+div.unitview-time .unitview-date {
+    font-size: 20px;
+    height: 22px;
+    text-align: center;
+    float: right;
+    margin: -30px 0 0 -10px;
+}
+div.unitview-time .unitview-date span {
+    display: block;
+    font-size: 16px;
+    height: 16px;
+}
+
+
+div.unitview-counter {
+    float:right; 
+    /*display:block;*/ 
+    margin-right: 2px;
+
+    
+}
+
+.graph-feat-drawn {
+    float:left;  
+    background-color: #275B90; 
+    height: 15px; 
+    margin-top: -8px;
+}
+
+.graph-feat-ref {
+    background-color: #aaa; 
+    height: 2px; 
+    margin-top: 7px;
+}
+
+.active-seq-position {
+    background-color: #275B90; 
+    color: white;
+    /*font-weight: bold;*/
+}
+
+.seq-position:hover {
+    background-color: #275B90; 
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    -o-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out; 
+}
+
+.raw-sequence {
+    background-color: #EAEAEA;
+    /*margin: 5px;*/
+    padding: 5px;
+}
+
+
+#view-feature-dialog-type {
+    font-weight: bold;
+}
+
+div.collapsible div.unitview-header {
+    cursor : pointer;
+}
+
+.collapsed .unitview-header .unitview-title:after {
+    content: "+";
+    float:right; 
+    display:block; 
+    /*background-image: url(custom-theme/images/ui-icons_eeeeee_256x240.png);
+    background-position: -48px -192px; 
+    height: 16px;
+    width: 16px;*/
+    margin-right: 2px;
+}
+
+.extended .unitview-header .unitview-title:after {
+    content: "-";
+    float:right; 
+    display:block; 
+    /*background-image: url(custom-theme/images/ui-icons_eeeeee_256x240.png);
+    background-position: -48px -192px; 
+    height: 16px;
+    width: 16px;*/
+    margin-right: 2px;
+}
+
+.jref-comment, .jref-consrtm, .jref-location {
+    margin: 0 0 0 0;
+}
+
+/*.jref-journal-pmed-link a {*/
+    /*margin-left: 1em;*/
+    /*background-color: #275B90; */
+    /*color: white !important;*/
+    /*padding: 2px;*/
+    /*font-weight: bold;*/
+/*}*/
+
+/*.jref-doi-link {*/
+    /*background-color: #275B90; */
+    /*color: white !important;*/
+    /*padding: 2px;*/
+    /*font-weight: bold;*/
+/*}*/
+
+
+.load-external-button{
+    cursor : pointer;
+}
+
+.jref .loaded {
+    padding: 10px;
+    text-align: justify;
+    border-top: 1px solid #bbb;
+
+}
+
+.control-pubmed-data{
+    margin-left: -10px;
+}
+
+.feature-popover {width: 400px;}
+#view-feature-dialog .seqdiv{
+    min-height: 300px;
+}
+
+
+
+.edit-icon {
+
+}
+
+.mesh-tag {
+    margin: 4px;
+}
+
+/*.jref-mesh-link {*/
+    /*background-color: #DDD;*/
+    /*padding: 1px;*/
+    /*border: 1px solid #AAA; */
+/*}*/
+
+
+#seqdiv-add-feature {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/*.dataTables_wrapper {*/
+    /*min-height: 100px !important;*/
+/*}*/
+
+/*.add-new{*/
+    /*margin-top: 10px !important;*/
+/*}*/
+
+/*better jquery ui buttons adapted  from http://www.filamentgroup.com/lab/styling_buttons_and_toolbars_with_the_jquery_ui_css_framework*//*/*/
+/*.fg-button { outline: 0; margin:0 4px 0 0; padding: 2px; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }*/
+/*.fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }*/
+
+/*a.fg-button { float:left; }*/
+
+/* remove extra button width in IE */
+/*button.fg-button { width:auto; overflow:visible; }*/
+
+/*.fg-button-icon-center {padding-left: 16px;}*/
+/*.fg-button-icon-left { padding-left: 2.1em; }*/
+/*.fg-button-icon-right { padding-right: 2.1em; }*/
+/*.fg-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }*/
+/*.fg-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }*/
+
+/*.fg-button-icon-solo { display:block; width:8px; text-indent: -9999px; }     *//* solo icon buttons must have block properties for the text-indent to work *//* */
+
+/*.fg-buttonset { float:left; }*/
+/*.fg-buttonset .fg-button { float: left; }*/
+/*.fg-buttonset-single .fg-button, */
+/*.fg-buttonset-multi .fg-button { margin-right: -1px;}*/
+
+/*.fg-toolbar { padding: .5em; margin: 0;  }*/
+/*.fg-toolbar .fg-buttonset { margin-right:1.5em; padding-left: 1px; }*/
+/*.fg-toolbar .fg-button { font-size: 1em;  }*/
+
+
+
+/*FIX FOR DATATABLE IN BOOTSTRAP*/
+
+div.dataTables_length label {
+    float: left;
+    text-align: left;
+}
+
+div.dataTables_length select {
+    width: 75px;
+}
+
+div.dataTables_filter label {
+    float: right;
+}
+
+div.dataTables_info {
+    padding-top: 8px;
+}
+
+div.dataTables_paginate {
+    float: right;
+    margin: 0;
+}
+
+table {
+    margin-bottom: 6px !important;
+    clear: both;
+}
+
+table.table thead .sorting,
+table.table thead .sorting_asc,
+table.table thead .sorting_desc,
+table.table thead .sorting_asc_disabled,
+table.table thead .sorting_desc_disabled {
+    cursor: pointer;
+    *cursor: hand;
+}
+
+table.table thead .sorting { background: url('../images/sort_both.png') no-repeat center right; }
+table.table thead .sorting_asc { background: url('../images/sort_asc.png') no-repeat center right; }
+table.table thead .sorting_desc { background: url('../images/sort_desc.png') no-repeat center right; }
+
+table.table thead .sorting_asc_disabled { background: url('../images/sort_asc_disabled.png') no-repeat center right; }
+table.table thead .sorting_desc_disabled { background: url('../images/sort_desc_disabled.png') no-repeat center right; }
+

@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*.pyo
+*.bak
+*.iml
+cache
+biosql/databases
+sessions
+errors
+uploads
+databases
+.idea*

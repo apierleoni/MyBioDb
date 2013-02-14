@@ -1,0 +1,30 @@
+<script type="text/javascript"><!--
+    // These variables are used by the web2py_ajax_init function in web2py_ajax.js (which is loaded below).
+    var w2p_ajax_confirm_message = "{{=T('Are you sure you want to delete this object?')}}";
+    var w2p_ajax_date_format = "{{=T('%Y-%m-%d')}}";
+    var w2p_ajax_datetime_format = "{{=T('%Y-%m-%d %H:%M:%S')}}";
+    //--></script>
+
+{{
+response.files.insert(1,URL('static','js/jquery.js'))
+response.files.insert(2,URL('static','js/bootstrap.min.js'))
+response.files.insert(3,URL('static','css/anytime.css'))
+response.files.insert(4,URL('static','js/anytime.js'))
+response.files.insert(5,URL('static','js/web2py.js'))
+#response.files.insert(6,URL('static','css/custom-theme/jquery-ui-1.10.0.custom.css'))
+#response.files.insert(7,URL('static','js/jquery-ui-1.10.0.custom.min.js'))
+#response.files.insert(8,URL('static','css/jquery.dataTables_themeroller.css'))
+response.files.insert(8,URL('static','css/jquery.dataTables.css'))
+response.files.insert(9,URL('static','js/jquery.dataTables.min.js'))
+response.files.insert(10,URL('static','js/paging.js'))
+response.files.insert(11,URL('static','js/jquery.livequery.js'))
+#response.files.insert(7,URL('static','js/jquery.jeditable.mini.js'))
+#response.files.insert(8,URL('static','js/jquery.jeditable.datepicker.js'))
+response.files.insert(12,URL('static','js/ui.js'))
+response.files.insert(13,URL('static','css/biosql.css'))
+response.files.insert(14,URL('static','bootstrap-editable/css/bootstrap-editable.css'))
+response.files.insert(15,URL('static','bootstrap-editable/js/bootstrap-editable.min.js'))
+response.files.insert(16,URL('static','js/bootstrapx-clickover.js'))
+response.include_meta()
+response.include_files()
+}}

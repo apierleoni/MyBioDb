@@ -1,0 +1,259 @@
+{{extend 'layout.html'}}
+
+{{=main_content}}
+
+<script type="text/javascript">
+
+    jQuery.fn.justtext = function() {
+
+        return $(this)  .clone()
+                .children()
+                .remove()
+                .end()
+                .text();
+
+    };
+
+    //turn to inline mode
+    $.fn.editable.defaults.mode = 'inline';
+
+    $('.edit-bioentry-name').editable({
+            type:  'text',
+            name:  'Entry Name',
+            pk:    {{=bioentry_id}},
+            url:   '{{=URL(r = request, f = "alter_bioentry")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'name' }
+    });
+
+    $('.edit-bioentry-description').editable({
+            type:  'text',
+            name:  'Entry Description',
+            pk:    {{=bioentry_id}},
+            url:   '{{=URL(r = request, f = "alter_bioentry")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'description' }
+    });
+
+
+
+    $(".edit-field-qualifier").each(function() {
+        var texttype = 'text'
+        if ($(this).justtext().length >50){
+            texttype = 'textarea'
+        }
+        $(this).editable({
+            type:  texttype,
+            name:  'Entry Annotation',
+            pk:    {{=bioentry_id}},
+            url:   '{{=URL(r = request, f = "alter_single_qualifier_value")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}",
+            'rank' : $(this).attr('rank'),
+            'id' :  $(this).parents('tr').first().find('td').first().text() }
+        });
+    });
+
+    $('.edit-field-feature-type').editable({     //takes pk from data-pk
+            type:  'text',
+            name:  'Feature Type',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Type',
+            params: {'type': 'type' }
+    });
+
+    $('.edit-field-feature-start').editable({  //takes pk from data-pk
+            type:  'number',
+            name:  'Feature Start',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Start',
+            params: {'type':  'start'}
+    });
+
+    $('.edit-field-feature-end').editable({   //takes pk from data-pk
+            type:  'number',
+            name:  'Feature End',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature End',
+            params: {'type':  'end'}
+    });
+
+    $('.edit-field-feature-identifier').editable({   //takes pk from data-pk
+            type:  'text',
+            name:  'Feature Identifier',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Identifier',
+            params: {'type':  'identifier' }
+    });
+
+    $('.edit-field-feature-description').editable({   //takes pk from data-pk
+            type:  'text',
+            name:  'Feature Description',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Description',
+            params: {'type':  'description' }
+    });
+
+    $('.edit-field-dbxref-dbname').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'dbxref dbname',
+        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
+        title: 'Enter dbxref dbname',
+        params: {'type':  'dbname' }
+    });
+
+    $('.edit-field-dbxref-accession').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'dbxref accession',
+        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
+        title: 'Enter dbxref accession',
+        params: {'type':  'accession' }
+    });
+
+
+    $(".edit-field-feature-qualifier-value").each(function() {
+        $(this).editable({
+            name:  'Feature qualifier value',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Description',
+            params: {'type':  'qualifier-value',
+                'key' : $(this).attr('data-key') }
+        });
+    });
+
+
+
+
+    $('[rel=clickover]').clickover({
+        template: '<div id="view-feature-popover" class="popover clickover  row span7"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>',
+        html : true,
+        allow_multiple : false,
+        tip_id: 'view-feature-popover',
+        class :  'clickover row span7',
+        //content : '<div class="seqdiv"><img src="{{=URL(request.application, 'static', 'ajax-loader.gif')}}"/></div> '
+        onShown: function() {
+            $('#view-feature-popover .popover-content').load('{{=URL(r=request, f = 'draw_feature_on_sequence')}}', {
+                    bioentry_id: "{{=bioentry_id}}",
+                    start: this.options.start,
+                    end : this.options.end});
+            }
+        });
+
+
+
+    $("div.jref .load-pubmed-data").live('click', function(){
+        var impatharray = window.location.href.split('/');
+        target = $(this).parent()
+        impatharray.pop();
+        impatharray.pop();
+        impatharray.push('static/ajax-loader.gif');
+        image_path = impatharray.join("/");
+        target.empty().html('<img src="'+image_path+'" />');
+
+        var pmid = target.attr('id').split("-")[2];
+        var patharray = window.location.href.split('/');
+        patharray.pop();
+        patharray.push('return_pubmed_data');
+        new_path = patharray.join("/")+'?pmid='+pmid;
+        //alert(image_path);
+        target.load(new_path).slideDown();
+        target.addClass('loaded');
+
+    });
+
+
+    $("div.jref .control-pubmed-data").live('click', function(){
+        target = $(this).parent().parent().find('.jref-additional-data').slideToggle();
+        var text = $(this).html();
+        $(this).html(
+                text == 'hide' ? 'show me more...' : 'hide'  );
+    });
+
+
+    <!--HANDLE FEATURE TABLE ROWS-->
+
+    /* Add a click handler to the rows - this could be used as a callback */
+    $('#feature-table').on('click', 'tbody tr', function(event) {
+        if ($(this).hasClass('info'))  {
+            $(this).removeClass('info');
+            $('#feature-delete').addClass('disabled');
+        } else {
+            $('#feature-table tr.info').removeClass('info');
+            $(this).addClass('info');
+            $('#feature-delete').removeClass('disabled');
+        }
+    });
+
+    /* Add a click handler to delete the row */
+    $('#feature-delete').click( function() {
+        if(!$(this).hasClass('disabled')) {
+            selected_tr  = $('#feature-table tr.info');
+            //var selected_tr_index = $('#feature-table').get().fnGetPosition(selected_tr.get());// not working need to be fixed ot remove the tr form the datatable
+            var selected_tr_pkid = selected_tr.attr('data-pk');
+            $.ajax({
+                type: "POST",
+                url: "{{=URL(r=request, f = 'delete_single_feature')}}",
+                dataType: "html",
+                data: {'seqfeature_id': selected_tr_pkid},
+                success: function (response) {
+                    $('#feature-delete').addClass('disabled');
+                    //$('#feature-table').get().fnDeleteRow(selected_tr_index);// not working triggering reload instead
+                    $('.flash').text(response);
+                    $('.flash').slideDown();
+                    //$('#feature-view').load("{{=URL(r=request, f= 'v_features', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
+                    window.location.href = window.location.href;//remove after fixing the datatable row removal
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    $('.flash').text(xhr.responseText);
+                    $('.flash').slideDown();
+                }
+            });
+        }
+    });
+
+
+    <!--HANDLE DBXREF TABLE ROWS-->
+
+    /* Add a click handler to the rows - this could be used as a callback */
+    $('#dbxref-table').on('click', 'tbody tr', function(event) {
+        if ($(this).hasClass('info'))  {
+            $(this).removeClass('info');
+            $('#dbxref-delete').addClass('disabled');
+        } else {
+            $('#dbxref-table tr.info').removeClass('info');
+            $(this).addClass('info');
+            $('#dbxref-delete').removeClass('disabled');
+        }
+    });
+
+    /* Add a click handler to delete the row */
+    $('#dbxref-delete').click( function() {
+        if(!$(this).hasClass('disabled')) {
+            selected_tr  = $('#dbxref-table tr.info');
+            //var selected_tr_index = $('#dbxref-table').get().fnGetPosition(selected_tr.get());// not working need to be fixed ot remove the tr form the datatable
+            var selected_tr_pkid = selected_tr.attr('data-pk');
+            $.ajax({
+                type: "POST",
+                url: "{{=URL(r=request, f = 'delete_single_dbxref')}}",
+                dataType: "html",
+                data: {'bioentry_id': '{{=bioentry_id}}',
+                    'dbxref_id': selected_tr_pkid},
+                success: function (response) {
+                    $('#dbxref-delete').addClass('disabled');
+                    //$('#dbxref-table').get().fnDeleteRow(selected_tr_index);// not working triggering reload instead
+                    $('.flash').html(response);
+                    $('.flash').slideDown();
+                    //$('#dbxref-view').load("{{=URL(r=request, f= 'v_dbxrefs', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
+                    window.location.href = window.location.href;//remove after fixing the datatable row removal
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    $('.flash').text(xhr.responseText);
+                    $('.flash').slideDown();
+                }
+            });
+        }
+    });
+
+
+
+</script> 

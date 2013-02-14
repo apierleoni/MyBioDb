@@ -1,0 +1,126 @@
+Web2py BioSQL Web Server Project Planning
+================================
+
+Status definintion:
+D: DONE
+IP: IN PROGRESS
+TD: TO DO (will be done!)
+P: PLANNED
+I: ISSUE TO BE SOLVED
+F: MAYBE IN SOME REMOTE FUTURE 
+
+A: NEEDED FOR ALPHA VERSION
+
+Relational DB Backend Handling
+----------------------------
+Relational dbs: to be handled via the web2py DAL
+- BioSQL schema (MUST work with a standard BioSQL db) [D] [A]
+- Upgraded BioSQL schema (with timestamps, and users) [D][A]
+- Archive DB to handle history [D][A]
+
+Backend to be tested:
+- SQLite [D][A]
+- PostgreSQL [D][A]
+- MySQL [TD][A]
+- Oracle [F]
+- MSSQL [F]
+- GAE [P]
+- ...
+
+WebServer Visualization
+------------------------------
+- Define visualization objects (main content, navigation three, tools, ...)[IP] [A]
+- Build a simple HTML/CSS/JS(Jquery) theme (start from web2py default template in 1.94.x) [TD][A] 
+	-nice downgrading in not too old browser [P]
+- Default view of a bioentry [IP][A]
+- Customizable view of a bioentry (methods to modify the default view tree) [TD]
+- Integrate graphical representation of features:
+	- Complete view with BioGraPy [IP][A]
+	- Partial view with CSS (like uniprot server) [TD][A]
+	- View features over sequence with javascript and checkbox [TD]
+- Structure view with Jmol ? [AndreaZ]
+- View bioentry history and diff [TD][A]
+
+WebServer Query Engine
+-------------------------------
+- Query engine for BioSQL schema [D][A]
+- Visual construction of complex queries with live counts [D][A]
+- Custom page results depending on the biodb [D][A]
+- Paginate results [D][A]
+- Order results [TD][A]
+
+ WebServer Administration
+--------------------------------
+- Include managment rigths via web2py auth [TD][A]
+- Build a simple interface to handle users [TD]
+- Access to batch load, archive and export functions [TD][A]
+
+WebServer Data Editing
+------------------------------
+Strictly depending on the web2py auth
+- AJAX inline data editing for text fields [IP][A]
+	- Handle each SeqRecord property (annotations, features, ...) with a specific handler [IP]
+- Design features over sequence [D][A]
+- Embed rich text processing for suitable fields [D][A]
+
+WebServer Data Inport
+------------------------------
+- Import from any Biopython supported format [D][A]
+- Import from local files [D][A]
+- Import from remote servers [IP][A]
+- Import from DAS servers [IP][A]
+
+WebServer Data Export
+------------------------------
+- Export pickled strings [D][A]
+- Export in FASTA format [D] [A]
+- Export in GenBank or EMBL formats [I] 
+- Export in an ad hoc defined XML format [F]
+
+WebServer Web Services
+------------------------------
+- REST (from web2py 1.94?)[TD][A]
+- SOAP (from web2py 1.91) [TD][A]
+- JSON? [P]
+- Serve bioentry in a specific format, or pickled [TD][A]
+- Remote queries [P] 
+
+Tools to be included
+------------------------
+- BLAST interface (with graphical view) [D][A]
+- Simple sequence analysis tools with plots [P]
+- Define an analysis framework to add sequence analysis methods (including predictions) [P]
+- Background process management (Eg. prediction daemons) [IP]
+
+Code Organization
+-----------------------
+- GitHub repository [D][A]
+- Use web2py plugin packaging as much as possible to make code portable [TD][A]
+
+Required External Packages
+------------------------------------
+- Biopython
+- DB backend package
+
+Optional External Packages
+------------------------------------
+- BLAST+
+- BioGraPy (matplotlib)
+
+
+Estimated time to completion
+------------------------------------
+For core functions:
+- WebServer Data Export: complete
+- Relational DB Backend Handling: working
+- Tools to be included: working
+- WebServer Query Engine: Apr 2011
+- WebServer Visualization: June 2011
+- WebServer Administration: Jul 2011
+- WebServer Data Editing: Aug 2011
+- WebServer Web Services: Sep 2011
+
+Alpha version due for Oct 2011
+Testing, testing, testing... [using unittest or doctest(works with web2py), and users]
+Release and possible publication draft in Dec 2011
+
