@@ -110,7 +110,10 @@ def view():
             input_error_redirect('ERROR! invalid bioentry data')
     else:
         input_error_redirect('ERROR! invalid bioentry data')
-
+    editable = False
+    if request.vars.editable == 'True':
+        editable = True
+    sidebar = UL(_class = "nav nav-list sidenav affix", _id = 'left-sidebar', **{"data-spy":"affix", "data-offset-top":"100"})
     if not request.vars.views:
         request.vars.views =  ['v_general', 'v_taxonomy', 'v_relationships',
                                'v_qualifiers','v_comments', 'v_sequence',
@@ -123,8 +126,13 @@ def view():
                                  content = IMG(_src = URL(request.application, 'static', 'ajax-loader.gif')),
                                  #content = '',
                                  ))
+        view_key = ''.join(view.split('v_')[1:])
 
-    return dict(main_content = main_content, bioentry_id = bioentry_id)
+        sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key)))
+
+
+
+    return dict(main_content = main_content, bioentry_id = bioentry_id, editable = editable, sidebar = sidebar)
     
     
 def v_general():
@@ -186,13 +194,11 @@ def v_general():
         
         
         return UnitView(title = title,
-                        year = year,
-                        month = month,
-                        day = day,
                         content = content,
                         counts = '',
                         footer = footer,
                         author = '',
+                        _id = 'general',
                         _class = '')
     return DIV()
     
@@ -201,9 +207,6 @@ def v_taxonomy():
     '''if request.vars.bioentry_id:
         content = DIV()
         return UnitView(title = 'Taxonomy',
-                        year = '',
-                        month = '',
-                        day = '',
                         content = content,
                         counts = '',
                         footer = '',
@@ -215,9 +218,6 @@ def v_relationships():
     '''if request.vars.bioentry_id:
         content = DIV()
         return UnitView(title = 'Relationships',
-                        year = '',
-                        month = '',
-                        day = '',
                         content = content,
                         counts = '',
                         footer = '',
@@ -252,13 +252,11 @@ def v_qualifiers():
             #    qualtbody.append(TR(k,biosql_data_beautify(v)))
             qaltable.append(qualtbody)
             return UnitView(title = 'General annotations (Qualifiers)',
-                            year = '',
-                            month = '',
-                            day = '',
                             content = qaltable,
                             counts = len(qualifiers.qualifiers),
                             footer = '',
                             author = '',
+                            _id = 'qualifiers',
                             _class = 'collapsible collapsed')
     return DIV()
   
@@ -266,9 +264,6 @@ def v_comments():
     '''if request.vars.bioentry_id:
         content = DIV()
         return UnitView(title = 'Comments',
-                        year = '',
-                        month = '',
-                        day = '',
                         content = content,
                         counts = '',
                         footer = '',
@@ -305,15 +300,12 @@ def v_features():
         control_btn.append(delete_btn)
         content = DIV(H4('Feature table'),feattable, control_btn)#, view_feature_dialog)
         return UnitView(title = 'Features',
-                        year = '',
-                        month = '',
-                        day = '',
                         content = content,
                         counts = len(features),
                         footer = '',
                         author = '',
                         _class = 'collapsible collapsed',
-                        _id = 'feature-view')
+                        _id = 'features')
     return DIV()
 
 def draw_feature_on_sequence():
@@ -361,15 +353,12 @@ def v_dbxrefs():
 
             content = DIV(dbxreftable,control_panel)
             return UnitView(title = 'Database cross-references (DBXrefs)',
-                            year = '',
-                            month = '',
-                            day = '',
                             content = content,
                             counts = len(dbxrefs),
                             footer = '',
                             author = '',
                             _class = 'collapsible collapsed',
-                            _id = 'dbxref-view')
+                            _id = 'dbxrefs')
     return DIV()
     
 def v_references():
@@ -397,13 +386,11 @@ def v_references():
                          _class = 'btn') )
             content = DIV(refstable,add_new)
             return UnitView(title = 'References',
-                            year = '',
-                            month = '',
-                            day = '',
                             content = content,
                             counts =  len(refs.references),
                             footer = '',
                             author = '',
+                            _id = 'references',
                             _class = 'collapsible collapsed')
     return DIV()
     
@@ -418,13 +405,11 @@ def v_sequence():
             returndiv.append(draw_sequence(sequence))
         
         return UnitView(title = 'Sequence',
-                        year = '',
-                        month = '',
-                        day = '',
                         content = returndiv,
                         counts = 'Length:' +str(len(sequence)),
                         footer = '',
                         author = '',
+                        _id = 'sequence',
                         _class = 'collapsible collapsed')
     return DIV()
     

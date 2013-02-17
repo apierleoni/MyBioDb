@@ -10,11 +10,7 @@ class UnitView():
     
         <div class="unitview"> 
             <div class="unitview-header"> 
-                <div class="unitview-time"> 
-                    <div class="unitview-year">2010</div> 
-                    <div class="unitview-date">16<span>apr</span></div> 
-                </div> 
-                <h1 class="unitview-title">Sample Post 1</h1> 
+                <h1 class="unitview-title">Sample Post 1</h1>
                 <div class=class="unitview-counter">38</div> 
             </header> 
             <p>content text here</p> 
@@ -29,9 +25,6 @@ class UnitView():
     def __init__(self,
                  title = '',
                  counts = '',
-                 year = '',
-                 day = '',
-                 month = '',
                  content = '',
                  author = '',
                  tags = '',
@@ -50,35 +43,6 @@ class UnitView():
             self.counts = counts.xml()
         except AttributeError:
             self.counts = str(counts)
-        try:
-            self.year = year.xml()
-        except AttributeError:
-            self.year = str(year)
-        try:
-            self.day = day.xml()
-        except AttributeError:
-            self.day = str(day)
-        try:
-            try:
-                month = int(month)
-                dmonth = {1:'jan',
-                          2:'feb',
-                          3:'mar',
-                          4:'apr',
-                          5:'may',
-                          6:'jun',
-                          7:'jul',
-                          8:'aug',
-                          9:'sep',
-                          10:'oct',
-                          11:'nov',
-                          12:'dec',}
-                self.month = dmonth[month]
-            except:
-                
-                self.month = month.xml().lower()[:3]
-        except AttributeError:
-            self.month = str(month).lower()[:3]
         try:
             self.content = content.xml()
         except AttributeError:
@@ -116,15 +80,7 @@ class UnitView():
         
     def xml(self):
         
-        #build date
-        if self.year or self.day or self.month:
-            timediv = '''                          <div class="unitview-time"> 
-                          <div class="unitview-year">%s</div> 
-                          <div class="unitview-date">%s<span>%s</span></div>
-                          </div> '''%(self.year, self.day, self.month)
-        else:
-            timediv = ''''''
-        
+
         if self.author or self.tags or self.button or self.footer: 
             author_line = tags_line = ''
             if self.author:
@@ -145,16 +101,15 @@ class UnitView():
         else:
             watermark='' 
         
-        fullxml = '''        <div id="%s" class="unitview row %s">
+        fullxml = '''        <div id="%s" class="unitview row %s" >
             <div class="unitview-header" onclick = "void(0)"> 
-                %s
-                <h2 class="unitview-title">%s</h2> 
+                <h2 class="unitview-title">%s</h2>
                 <div class="unitview-counter">%s</div> 
             </div> 
             <div class="unitview-content">%s</div> 
             %s
             %s
-        </div> %s ''' %(self._id, self._class, '', self.title, self.counts, self.content,footerdiv,watermark, self.script)#timediv, self.title, self.counts, self.content,footerdiv,watermark, self.script)
+        </div> %s ''' %(self._id, self._class, self.title, self.counts, self.content,footerdiv,watermark, self.script)
         
         
         return fullxml

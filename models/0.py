@@ -2,8 +2,8 @@ from gluon.storage import Storage
 settings = Storage()
 
 settings.migrate = True
-settings.title = 'WebBioSQL'
-settings.subtitle = 'Web UI to BioSQL'
+settings.title = 'MyBioDb'
+settings.subtitle = 'A Web UI to a BioSQL database'
 settings.author = 'Andrea Pierleoni'
 settings.author_email = 'apierleoni.dev@gmail.com'
 settings.keywords = 'Web BioSQL web2py '

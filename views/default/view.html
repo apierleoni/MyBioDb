@@ -1,125 +1,14 @@
+{{left_sidebar_enabled=True}}
 {{extend 'layout.html'}}
+
 
 {{=main_content}}
 
+{{block left_sidebar}}
+{{=sidebar}}
+{{end}}
+
 <script type="text/javascript">
-
-    jQuery.fn.justtext = function() {
-
-        return $(this)  .clone()
-                .children()
-                .remove()
-                .end()
-                .text();
-
-    };
-
-    //turn to inline mode
-    $.fn.editable.defaults.mode = 'inline';
-
-    $('.edit-bioentry-name').editable({
-            type:  'text',
-            name:  'Entry Name',
-            pk:    {{=bioentry_id}},
-            url:   '{{=URL(r = request, f = "alter_bioentry")}}',
-            title: 'Enter entry name',
-            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'name' }
-    });
-
-    $('.edit-bioentry-description').editable({
-            type:  'text',
-            name:  'Entry Description',
-            pk:    {{=bioentry_id}},
-            url:   '{{=URL(r = request, f = "alter_bioentry")}}',
-            title: 'Enter entry name',
-            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'description' }
-    });
-
-
-
-    $(".edit-field-qualifier").each(function() {
-        var texttype = 'text'
-        if ($(this).justtext().length >50){
-            texttype = 'textarea'
-        }
-        $(this).editable({
-            type:  texttype,
-            name:  'Entry Annotation',
-            pk:    {{=bioentry_id}},
-            url:   '{{=URL(r = request, f = "alter_single_qualifier_value")}}',
-            title: 'Enter entry name',
-            params: {'bioentry_id': "{{=bioentry_id}}",
-            'rank' : $(this).attr('rank'),
-            'id' :  $(this).parents('tr').first().find('td').first().text() }
-        });
-    });
-
-    $('.edit-field-feature-type').editable({     //takes pk from data-pk
-            type:  'text',
-            name:  'Feature Type',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature Type',
-            params: {'type': 'type' }
-    });
-
-    $('.edit-field-feature-start').editable({  //takes pk from data-pk
-            type:  'number',
-            name:  'Feature Start',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature Start',
-            params: {'type':  'start'}
-    });
-
-    $('.edit-field-feature-end').editable({   //takes pk from data-pk
-            type:  'number',
-            name:  'Feature End',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature End',
-            params: {'type':  'end'}
-    });
-
-    $('.edit-field-feature-identifier').editable({   //takes pk from data-pk
-            type:  'text',
-            name:  'Feature Identifier',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature Identifier',
-            params: {'type':  'identifier' }
-    });
-
-    $('.edit-field-feature-description').editable({   //takes pk from data-pk
-            type:  'text',
-            name:  'Feature Description',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature Description',
-            params: {'type':  'description' }
-    });
-
-    $('.edit-field-dbxref-dbname').editable({   //takes pk from data-pk
-        type:  'text',
-        name:  'dbxref dbname',
-        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
-        title: 'Enter dbxref dbname',
-        params: {'type':  'dbname' }
-    });
-
-    $('.edit-field-dbxref-accession').editable({   //takes pk from data-pk
-        type:  'text',
-        name:  'dbxref accession',
-        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
-        title: 'Enter dbxref accession',
-        params: {'type':  'accession' }
-    });
-
-
-    $(".edit-field-feature-qualifier-value").each(function() {
-        $(this).editable({
-            name:  'Feature qualifier value',
-            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
-            title: 'Enter Feature Description',
-            params: {'type':  'qualifier-value',
-                'key' : $(this).attr('data-key') }
-        });
-    });
 
 
 
@@ -169,6 +58,129 @@
                 text == 'hide' ? 'show me more...' : 'hide'  );
     });
 
+    $("#left-sidebar").affix();
+
+    {{if editable:}}
+    <!--enable editing if authorized-->
+
+    jQuery.fn.justtext = function() {
+
+        return $(this)  .clone()
+                .children()
+                .remove()
+                .end()
+                .text();
+
+    };
+
+    //turn to inline mode
+    $.fn.editable.defaults.mode = 'inline';
+
+    $('.edit-bioentry-name').editable({
+        type:  'text',
+        name:  'Entry Name',
+        pk:    {{=bioentry_id}},
+    url:   '{{=URL(r = request, f = "alter_bioentry")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'name' }
+    });
+
+    $('.edit-bioentry-description').editable({
+        type:  'text',
+        name:  'Entry Description',
+        pk:    {{=bioentry_id}},
+    url:   '{{=URL(r = request, f = "alter_bioentry")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}", 'type' : 'description' }
+    });
+
+
+
+    $(".edit-field-qualifier").each(function() {
+                var texttype = 'text'
+                if ($(this).justtext().length >50){
+                    texttype = 'textarea'
+                }
+                $(this).editable({
+                    type:  texttype,
+                    name:  'Entry Annotation',
+                    pk:    {{=bioentry_id}},
+            url:   '{{=URL(r = request, f = "alter_single_qualifier_value")}}',
+            title: 'Enter entry name',
+            params: {'bioentry_id': "{{=bioentry_id}}",
+            'rank' : $(this).attr('rank'),
+            'id' :  $(this).parents('tr').first().find('td').first().text() }
+    });
+    });
+
+    $('.edit-field-feature-type').editable({     //takes pk from data-pk
+        type:  'text',
+        name:  'Feature Type',
+        url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+        title: 'Enter Feature Type',
+        params: {'type': 'type' }
+    });
+
+    $('.edit-field-feature-start').editable({  //takes pk from data-pk
+        type:  'number',
+        name:  'Feature Start',
+        url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+        title: 'Enter Feature Start',
+        params: {'type':  'start'}
+    });
+
+    $('.edit-field-feature-end').editable({   //takes pk from data-pk
+        type:  'number',
+        name:  'Feature End',
+        url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+        title: 'Enter Feature End',
+        params: {'type':  'end'}
+    });
+
+    $('.edit-field-feature-identifier').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'Feature Identifier',
+        url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+        title: 'Enter Feature Identifier',
+        params: {'type':  'identifier' }
+    });
+
+    $('.edit-field-feature-description').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'Feature Description',
+        url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+        title: 'Enter Feature Description',
+        params: {'type':  'description' }
+    });
+
+    $('.edit-field-dbxref-dbname').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'dbxref dbname',
+        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
+        title: 'Enter dbxref dbname',
+        params: {'type':  'dbname' }
+    });
+
+    $('.edit-field-dbxref-accession').editable({   //takes pk from data-pk
+        type:  'text',
+        name:  'dbxref accession',
+        url:   '{{=URL(r = request, f = "alter_single_dbxref")}}',
+        title: 'Enter dbxref accession',
+        params: {'type':  'accession' }
+    });
+
+
+    $(".edit-field-feature-qualifier-value").each(function() {
+        $(this).editable({
+            name:  'Feature qualifier value',
+            url:   '{{=URL(r = request, f = "alter_single_feature_value")}}',
+            title: 'Enter Feature Description',
+            params: {'type':  'qualifier-value',
+                'key' : $(this).attr('data-key') }
+        });
+    });
+
+
 
     <!--HANDLE FEATURE TABLE ROWS-->
 
@@ -200,7 +212,7 @@
                     //$('#feature-table').get().fnDeleteRow(selected_tr_index);// not working triggering reload instead
                     $('.flash').text(response);
                     $('.flash').slideDown();
-                    //$('#feature-view').load("{{=URL(r=request, f= 'v_features', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
+                    //$('#features').load("{{=URL(r=request, f= 'v_features', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
                     window.location.href = window.location.href;//remove after fixing the datatable row removal
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -243,7 +255,7 @@
                     //$('#dbxref-table').get().fnDeleteRow(selected_tr_index);// not working triggering reload instead
                     $('.flash').html(response);
                     $('.flash').slideDown();
-                    //$('#dbxref-view').load("{{=URL(r=request, f= 'v_dbxrefs', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
+                    //$('#dbxrefs').load("{{=URL(r=request, f= 'v_dbxrefs', vars = dict(bioentry_id = bioentry_id))}}"); // the new added object will not be functional ,need to use livequery everywhere
                     window.location.href = window.location.href;//remove after fixing the datatable row removal
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -254,6 +266,7 @@
         }
     });
 
+    {{pass #end editable js}}
 
 
 </script> 
