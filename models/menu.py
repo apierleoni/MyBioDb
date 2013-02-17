@@ -6,3 +6,4 @@ response.meta.description = settings.description
 response.menu = [
 (T('Index'),URL('default','index')==URL(),URL('default','index'),[]),
 ]
+left_sidebar_enabled = True

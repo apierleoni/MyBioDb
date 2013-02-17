@@ -53,7 +53,6 @@ $(document).ready(function() {
             "bFilter": true,
             "bInfo": true,
             "bAutoWidth": true ,
-            "sPaginationType": "full_numbers",
             "bDeferRender": true,
             "aaSorting": []
         });

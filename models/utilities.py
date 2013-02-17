@@ -105,7 +105,7 @@ def draw_single_feature(feat,length, feat_id):
 
               feat.location.end.position - feat.location.start.position,
               SPAN(description,_class = 'edit-field-feature-description',**{'_data-pk': feat_id}),
-              DIV(graphic_view, **{'_class': 'view-feature','_rel':"clickover", '_data-placement':"bottom",
+              TD(graphic_view, **{'_class': 'view-feature','_rel':"clickover", '_data-placement':"bottom",
                                    '_data-original-title':"Feature type: "+feat.type,
                                    '_data-start':feat.location.start.position+1,
                                    '_data-end':feat.location.end.position}),
