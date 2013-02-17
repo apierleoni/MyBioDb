@@ -166,9 +166,9 @@ div.collapsible div.unitview-header {
 
 }
 
-.btn a {
-    color: white;
-}
+/*.btn a {
+    color: black;
+}*/
 
 /* Sidebar */
 
@@ -184,24 +184,24 @@ div.collapsible div.unitview-header {
     -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
     box-shadow: 0 1px 4px rgba(0,0,0,.065);
 }
-.sidenav > li > a {
+.sidenav > li > a.affix-element {
     display: block;
     width: 110px \9;
     margin: 0 0 -1px;
     padding: 8px 14px;
     border: 1px solid #e5e5e5;
 }
-.sidenav > li:first-child > a {
+.sidenav > li:first-child > a.affix-element {
     -webkit-border-radius: 6px 6px 0 0;
     -moz-border-radius: 6px 6px 0 0;
     border-radius: 6px 6px 0 0;
 }
-.sidenav > li:last-child > a {
+.sidenav > li:last-child > a.affix-element {
     -webkit-border-radius: 0 0 6px 6px;
     -moz-border-radius: 0 0 6px 6px;
     border-radius: 0 0 6px 6px;
 }
-.sidenav > .active > a {
+.sidenav > .active > a.affix-element {
     position: relative;
     z-index: 2;
     padding: 9px 15px;
@@ -218,14 +218,14 @@ div.collapsible div.unitview-header {
     margin-right: -6px;
     opacity: .25;
 }
-.sidenav > li > a:hover {
+.sidenav > li > a.affix-element:hover {
     background-color: #f5f5f5;
 }
-.sidenav a:hover .icon-chevron-right {
+.sidenav a.affix-element:hover .icon-chevron-right {
     opacity: .5;
 }
 .sidenav .active .icon-chevron-right,
-.sidenav .active a:hover .icon-chevron-right {
+.sidenav .active a.affix-element:hover .icon-chevron-right {
     background-image: url(../images/glyphicons-halflings-white.png);
     opacity: 1;
 }

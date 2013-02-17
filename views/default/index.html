@@ -1,8 +1,8 @@
 {{extend 'layout.html'}}
 
-<h1>Welcome Web2py and BioSQL test on FluxFelx</h1>
 {{= DIV(UL(
-    LI(A('Load an entry from UniProt', _href = URL(r = request, f = 'uniprot_remote_load'))),
-    LI(A('View loaded entries', _href = URL(r = request, f = 'view_uniprot_entries'))),
-    ))
+        LI(A('Load an entry form local file', _href = URL(r = request, f = 'import_entry'))),
+        LI(A('Load an entry remotely from UniProt', _href = URL(r = request, f = 'uniprot_remote_load'))),
+        LI(A('View loaded entries', _href = URL(r = request, f = 'view_uniprot_entries'))),
+        ))
 }}

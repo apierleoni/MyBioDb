@@ -29,7 +29,7 @@ $(document).ready(function() {
 
     $('.datatable').each(function() {
             $(this).dataTable({
-                "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+                "sDom": "<'row'<'span5'l><'span5'f>r>t<'row'<'span5'i><'span5'p>>",
                 "sWrapper": "dataTables_wrapper form-inline",
                 "sPaginationType": "bootstrap",
                 "bPaginate": true,
@@ -44,7 +44,7 @@ $(document).ready(function() {
 
     $('.datatable-not-sorted').livequery(function() {
         $(this).dataTable({
-            "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+            "sDom": "<'row'<'span5'l><'span5'f>r>t<'row'<'span5'i><'span5'p>>",
             "sWrapper": "dataTables_wrapper form-inline",
             "sPaginationType": "bootstrap",
             "bPaginate": true,
@@ -60,7 +60,7 @@ $(document).ready(function() {
 
     $('.datatable-inverted').livequery(function() {
             $(this).dataTable({
-                "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+                "sDom": "<'row'<'span5'l><'span5'f>r>t<'row'<'span5'i><'span5'p>>",
                 "sWrapper": "dataTables_wrapper form-inline",
                 "sPaginationType": "bootstrap",
                 "bPaginate": true,

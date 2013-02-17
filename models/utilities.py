@@ -54,7 +54,7 @@ def draw_sequence(sequence, mode = 'simple', alphabet = None):
       
 
 def draw_graphic_view(start, end, length):
-    min_width = 1
+    min_width = 2
     total_width = 100
     margin_left= round(float(start)/length*total_width,0)
     width = round(float(end-start)/length*total_width,0)

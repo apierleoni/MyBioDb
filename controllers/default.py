@@ -128,7 +128,16 @@ def view():
                                  ))
         view_key = ''.join(view.split('v_')[1:])
 
-        sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key)))
+        sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key, _class = 'affix-element')))
+
+    if not editable:
+        sidebar.append(LI(A('Edit',
+                            _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id, editable = True))),
+                            _class = 'btn btn-primary btn-block'))
+    else:
+        sidebar.append(LI(A('Done editing',
+                            _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id)),
+                            _class = 'btn btn-primary btn-block')))
 
 
 
@@ -211,7 +220,7 @@ def v_taxonomy():
                         counts = '',
                         footer = '',
                         author = '',
-                        _class = 'collapsible collapsed')'''
+                        _class = 'collapsible ')'''
     return DIV()
     
 def v_relationships():
@@ -222,7 +231,7 @@ def v_relationships():
                         counts = '',
                         footer = '',
                         author = '',
-                        _class = 'collapsible collapsed')'''
+                        _class = 'collapsible ')'''
     return DIV()
     
 def v_qualifiers():
@@ -257,7 +266,7 @@ def v_qualifiers():
                             footer = '',
                             author = '',
                             _id = 'qualifiers',
-                            _class = 'collapsible collapsed')
+                            _class = 'collapsible ')
     return DIV()
   
 def v_comments():
@@ -268,7 +277,7 @@ def v_comments():
                         counts = '',
                         footer = '',
                         author = '',
-                        _class = 'collapsible collapsed')'''
+                        _class = 'collapsible ')'''
     return DIV()
     
 
@@ -304,7 +313,7 @@ def v_features():
                         counts = len(features),
                         footer = '',
                         author = '',
-                        _class = 'collapsible collapsed',
+                        _class = 'collapsible ',
                         _id = 'features')
     return DIV()
 
@@ -357,7 +366,7 @@ def v_dbxrefs():
                             counts = len(dbxrefs),
                             footer = '',
                             author = '',
-                            _class = 'collapsible collapsed',
+                            _class = 'collapsible ',
                             _id = 'dbxrefs')
     return DIV()
     
@@ -391,7 +400,7 @@ def v_references():
                             footer = '',
                             author = '',
                             _id = 'references',
-                            _class = 'collapsible collapsed')
+                            _class = 'collapsible ')
     return DIV()
     
 def v_sequence():
@@ -410,7 +419,7 @@ def v_sequence():
                         footer = '',
                         author = '',
                         _id = 'sequence',
-                        _class = 'collapsible collapsed')
+                        _class = 'collapsible ')
     return DIV()
     
 
