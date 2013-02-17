@@ -8,7 +8,7 @@ A fully featured Biological database webapp based on:
 
 ## Install
 * clone this repo into a web2py application folder
-* launch web2py: ```python web2py```
+* launch web2py: ```python web2py.py```
 * if running locally go to [http://localhost:8000/MyBioDb](http://localhost:8000/MyBioDb)
 * enjoy
 
