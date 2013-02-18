@@ -91,7 +91,15 @@ def view_uniprot_entries():
 def input_error_redirect(error):
     session.flash = str(error)
     redirect(URL(r=request, f = 'index'))
-    
+
+
+def search():
+    if request.vars.query:
+        return dict(content = "Search for: "+ request.vars.query)
+    else:
+        return dict(content = "Search not implemented yet")
+
+
 def view():    
     main_content = DIV(_id = 'maincontent')
     if request.vars.bioentry_id:

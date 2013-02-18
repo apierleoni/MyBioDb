@@ -70,6 +70,7 @@
     <div class="flash">{{=response.flash or ''}}</div>
     <div class="navbar-inner">
       <div class="container">
+        <a class="brand" href="./index.html">{{=request.application}}</a>
         <!-- the next tag is necessary for bootstrap menus, do not remove -->
         <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
           <span class="icon-bar"></span>
@@ -77,6 +78,7 @@
           <span class="icon-bar"></span>
         </button>
 	{{=response.logo or ''}}
+
         <ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
         <div class="nav-collapse">
           {{is_mobile=request.user_agent().is_mobile}}
@@ -84,6 +86,12 @@
           {{=MENU(response.menu, _class='mobile-menu nav' if is_mobile else 'nav',mobile=is_mobile,li_class='dropdown',ul_class='dropdown-menu')}}
           {{pass}}
         </div><!--/.nav-collapse -->
+          <div class="span3 pull-right">
+              <form class="navbar-search" action="{{=URL(r=request,  f='search')}}" enctype="multipart/form-data" method="post">
+                  <input type="text" class="search-query span2" placeholder="Search" name="query">
+                  <div class="icon-search"></div>
+              </form>
+          </div>
       </div>
     </div>
   </div><!--/top navbar -->
@@ -94,8 +102,8 @@
         <div class="span12">
             <div class="page-header">
                 <h1>
-                    {{=response.title or request.application}}
-                    <small>{{=response.subtitle or ''}}</small>
+                    {{block header}}
+                    {{end}}
                 </h1>
             </div>
         </div>

@@ -238,6 +238,25 @@ div.collapsible div.unitview-header {
     bottom: 270px;
 }
 
+/*
+navbar search
+*/
+
+
+.navbar-search {
+    position: relative;
+}
+
+.navbar-search .search-query {
+    padding-left: 29px !important;
+}
+
+.navbar-search .icon-search {
+    position: absolute;
+    top: 7px;
+    left: 11px;
+    /*background-image: url("http://twitter.github.com/bootstrap/assets/img/glyphicons-halflings.png");*/
+}
 
 
 

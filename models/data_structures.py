@@ -101,7 +101,7 @@ class UnitView():
         else:
             watermark='' 
         
-        fullxml = '''        <div id="%s" class="unitview row %s" >
+        fullxml = '''        <div id="%s" class="unitview row %s" data-spy="scroll" data-target=".sidenav">
             <div class="unitview-header" onclick = "void(0)"> 
                 <h2 class="unitview-title">%s</h2>
                 <div class="unitview-counter">%s</div> 
