@@ -138,18 +138,19 @@ def view():
 
         sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key, _class = 'affix-element')))
 
+    toolbar = DIV()
     if not editable:
-        sidebar.append(LI(A('Edit',
+        toolbar.append(LI(A('Edit',
                             _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id, editable = True))),
                             _class = 'btn btn-primary btn-block'))
     else:
-        sidebar.append(LI(A('Done editing',
+        toolbar.append(LI(A('Done editing',
                             _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id)),
                             _class = 'btn btn-primary btn-block')))
 
 
 
-    return dict(main_content = main_content, bioentry_id = bioentry_id, editable = editable, sidebar = sidebar)
+    return dict(main_content = main_content, bioentry_id = bioentry_id, editable = editable, sidebar = sidebar, toolbar = toolbar)
     
     
 def v_general():
