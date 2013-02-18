@@ -170,8 +170,17 @@ class SeqFeatureEq(SeqFeature.SeqFeature):
      
        
 class BaseBioSQL():
-    '''Base class for to handlers for BioSQL data '''
+    '''Base class for to handlers for BioSQL data
+
+    THIS CLASS AND ALL ITS SUBCLASSES ARE DEPRECATED
+    SINCE THEY CANNOT BE USED IN A MULTIUSER ENVIROMENT
+    FOR WRITE, JUST FOR READING.
+
+    '''
     def __init__(self, handler,):
+        warnings.warn("Call to deprecated class",
+                      category=DeprecationWarning,
+                      stacklevel=2)
         self.handler = handler
         self.adaptor = handler.adaptor
     
