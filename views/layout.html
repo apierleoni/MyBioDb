@@ -64,7 +64,7 @@
   {{block head}}{{end}}
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".sidenav">
   <!-- Navbar ================================================== -->
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="flash">{{=response.flash or ''}}</div>
@@ -88,7 +88,7 @@
     </div>
   </div><!--/top navbar -->
 
-  <div class="container">
+  <div class="container" >
     <!-- Masthead ================================================== -->
     <header class="mastheader row" id="header">
         <div class="span12">

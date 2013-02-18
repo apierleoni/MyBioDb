@@ -26,6 +26,7 @@ $(document).ready(function() {
     });
 
 
+//    DATATABLE HANDLING
 
     $('.datatable').each(function() {
             $(this).dataTable({
@@ -105,5 +106,12 @@ $(document).ready(function() {
         "sSortDesc": "header headerSortUp",
         "sSortable": "header"
     } );
+
+
+    //scrollpsy
+    $(".container").scrollspy();
+    $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this).scrollspy('refresh')
+    });
 
 });

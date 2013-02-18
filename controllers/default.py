@@ -113,7 +113,7 @@ def view():
     editable = False
     if request.vars.editable == 'True':
         editable = True
-    sidebar = UL(_class = "nav nav-list sidenav affix", _id = 'left-sidebar', **{"data-spy":"affix", "data-offset-top":"100"})
+    sidebar = UL(_class = "nav nav-list sidenav affix", _id = 'left-sidebar', **{"data-spy":"affix",})
     if not request.vars.views:
         request.vars.views =  ['v_general', 'v_taxonomy', 'v_relationships',
                                'v_qualifiers','v_comments', 'v_sequence',
