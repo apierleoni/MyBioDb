@@ -2,3 +2,30 @@
 
 <h1>Search</h1>
 {{=content_body}}
+
+
+
+
+<script>
+        $('#search-results').dataTable( {
+            "bProcessing": true,
+            "sAjaxSource": '{{=URL(r=request, f="search_handler.json",vars = request.vars)}}',
+            aoColumns: [ {"sTitle" : "Name"},
+                         {"sTitle" : "Accession"},
+                         {"sTitle" : "Description"}
+                       ],
+            "sDom": "<'row'<'span5'l><'span5'f>r>t<'row'<'span5'i><'span5'p>>",
+             "sWrapper": "dataTables_wrapper form-inline",
+             "sPaginationType": "bootstrap",
+             "bPaginate": true,
+             "bSort": true,
+             "bLengthChange": true,
+             "bFilter": true,
+             "bInfo": true,
+             "bAutoWidth": true ,
+             "bDeferRender": true,
+        } );
+
+
+
+</script>

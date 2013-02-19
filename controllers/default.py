@@ -114,8 +114,12 @@ def search():
         return d
 
     if request.vars:
-        return dict(content_body= DIV(SPAN('not implemented', _class = 'alert alert-error'), H3('your query:'),P(BEAUTIFY(request.vars))))
-    else:
+        result_table = TABLE(_id='search-results', _class = 'table table-striped table-bordered table-hover')
+        if 'query' in request.vars:# simple search
+            return dict(content_body=result_table)
+        else:
+            return dict(content_body= DIV(SPAN('not implemented', _class = 'alert alert-error'), H3('your query:'),P(BEAUTIFY(request.vars)),result_table))
+    else:# show advanced query builder
 
 
         biodbsel = SELECT('ALL', _id = 'biodatabase', _name = 'biodatabase')
@@ -261,12 +265,37 @@ def _validate_query():
 
             if field not in ['Name', 'Description', 'Quick', 'Accession', 'Accession', 'Sequence',
                              'Created by', 'Creation date', 'Last modification date', 'Last modified by' ]:#cannot use query_count since there is no groupby in it
-                query_count = len(query_obj.select())
+                query_count = query_obj.count()
             return query_count
         except NotImplementedError:
             return SPAN('Wrong operator', _style = 'color:#970000;')
     else:
         return 0
+
+
+def search_handler():
+    '''initialize search object '''
+    if request.vars.biodatabase:
+        search = BioSQLSearch(biodb_handler, biodatabase = biodatabase)
+    else:
+        search = BioSQLSearch(biodb_handler)
+    data = []
+    result_ids = []
+    if request.vars.query != None:
+        query_obj =  search.quick
+        result_count = query_obj.contains(request.vars.query)
+        if result_count:
+            result_ids = query_obj.select()
+
+    if result_ids:
+        data.extend(get_search_result_table_from_ids(result_ids))
+
+    else:
+        data.append(['nothing found','',''])
+        data.append(['testing a1','a2','a3'])
+        data.append(['testing b1','b2','b3'])
+
+    return dict(aaData = data)
 
 def view():    
     main_content = DIV(_id = 'maincontent')

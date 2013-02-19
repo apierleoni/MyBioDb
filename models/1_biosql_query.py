@@ -4,7 +4,7 @@ class BioSQLQuery(object):
     '''
     template class
     
-    These are the so-called Òrich comparisonÓ methods, and are called for comparison operators in preference to __cmp__() below. 
+    These are the so-called ï¿½rich comparisonï¿½ methods, and are called for comparison operators in preference to __cmp__() below. 
     The correspondence between operator symbols and method names is as follows: x<y calls x.__lt__(y), x<=y calls x.__le__(y), 
     x==y calls x.__eq__(y), x!=y and x<>y call x.__ne__(y), x>y calls x.__gt__(y), and x>=y calls x.__ge__(y).'''
     
@@ -117,10 +117,10 @@ class BioSQLQueryQuick(BioSQLQuery):
                                               (self.adaptor.bioentry.description.lower().contains(element.lower())) | \
                                               (self.adaptor.bioentry.identifier.lower().contains(element.lower()))  )
         else:
-            localquery = ((self.adaptor.bioentry.name.lower().contains(element.lower())) | \
-                          (self.adaptor.bioentry.accession.lower().contains(element.lower())) | \
-                          (self.adaptor.bioentry.description.lower().contains(element.lower())) | \
-                          (self.adaptor.bioentry.identifier.lower().contains(element.lower())))
+            localquery = ((self.adaptor.bioentry.name.lower().contains(other.lower())) | \
+                          (self.adaptor.bioentry.accession.lower().contains(other.lower())) | \
+                          (self.adaptor.bioentry.description.lower().contains(other.lower())) | \
+                          (self.adaptor.bioentry.identifier.lower().contains(other.lower())))
         if self.query:
             self.query = self.query | localquery    
         else:
@@ -141,10 +141,10 @@ class BioSQLQueryQuick(BioSQLQuery):
                                               (self.adaptor.bioentry.description.lower().startswith(element.lower())) | \
                                               (self.adaptor.bioentry.identifier.lower().startswith(element.lower())))
         else:
-            localquery = ((self.adaptor.bioentry.name.lower().startswith(element.lower())) | \
-                          (self.adaptor.bioentry.accession.lower().startswith(element.lower())) | \
-                          (self.adaptor.bioentry.description.lower().startswith(element.lower())) | \
-                          (self.adaptor.bioentry.identifier.lower().startswith(element.lower())))
+            localquery = ((self.adaptor.bioentry.name.lower().startswith(other.lower())) | \
+                          (self.adaptor.bioentry.accession.lower().startswith(other.lower())) | \
+                          (self.adaptor.bioentry.description.lower().startswith(other.lower())) | \
+                          (self.adaptor.bioentry.identifier.lower().startswith(other.lower())))
         if self.query:
             self.query = self.query | localquery    
         else:
@@ -902,13 +902,13 @@ class BioSQLQueryKeyword(BioSQLQuery):
         if isinstance(other, list):
             for i, element in enumerate(other):
                 if not i:
-                    localquery = ((self.adaptor.bioentry_qualifier_value.value == value) & \
+                    localquery = ((self.adaptor.bioentry_qualifier_value.value == element) & \
                                   (self.adaptor.term.name.lower().startswith('keyword')))
                 else:
-                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value == value) & \
+                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value == element) & \
                                                (self.adaptor.term.name.lower().startswith('keyword')))
         else:
-            localquery = ((self.adaptor.bioentry_qualifier_value.value == value) & \
+            localquery = ((self.adaptor.bioentry_qualifier_value.value == other) & \
                           (self.adaptor.term.name.lower().startswith('keyword')))
         localquery = (prequery & localquery)
         if self.query:
@@ -923,13 +923,13 @@ class BioSQLQueryKeyword(BioSQLQuery):
         if isinstance(other, list):
             for i, element in enumerate(other):
                 if not i:
-                    localquery = ((self.adaptor.bioentry_qualifier_value.value != value) & \
+                    localquery = ((self.adaptor.bioentry_qualifier_value.value != element) & \
                                   (self.adaptor.term.name.lower().startswith('keyword')))
                 else:
-                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value != value) & \
+                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value != element) & \
                                                (self.adaptor.term.name.lower().startswith('keyword')))
         else:
-            localquery = ((self.adaptor.bioentry_qualifier_value.value == value) & \
+            localquery = ((self.adaptor.bioentry_qualifier_value.value == other) & \
                           (self.adaptor.term.name.lower().startswith('keyword')))
         localquery = (prequery & localquery)
         if self.query:
@@ -944,13 +944,13 @@ class BioSQLQueryKeyword(BioSQLQuery):
         if isinstance(other, list):
             for i, element in enumerate(other):
                 if not i:
-                    localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().contains(value.lower())) & \
+                    localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().contains(element.lower())) & \
                                   (self.adaptor.term.name.lower().startswith('keyword')))
                 else:
-                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value.lower().contains(value.lower())) & \
+                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value.lower().contains(element.lower())) & \
                                                (self.adaptor.term.name.lower().startswith('keyword')))
         else:
-            localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().contains(value.lower())) & \
+            localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().contains(other.lower())) & \
                           (self.adaptor.term.name.lower().startswith('keyword')))
         localquery = (prequery & localquery)
         if self.query:
@@ -965,13 +965,13 @@ class BioSQLQueryKeyword(BioSQLQuery):
         if isinstance(other, list):
             for i, element in enumerate(other):
                 if not i:
-                    localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(value.lower())) & \
+                    localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(element.lower())) & \
                                   (self.adaptor.term.name.lower().startswith('keyword')))
                 else:
-                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(value.lower())) & \
+                    localquery = localquery | ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(element.lower())) & \
                                                (self.adaptor.term.name.lower().startswith('keyword')))
         else:
-            localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(value.lower())) & \
+            localquery = ((self.adaptor.bioentry_qualifier_value.value.lower().startswith(other.lower())) & \
                           (self.adaptor.term.name.lower().startswith('keyword')))
         localquery = (prequery & localquery)
         if self.query:

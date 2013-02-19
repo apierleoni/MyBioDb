@@ -343,4 +343,23 @@ def return_feature_type_select(biosqldb):
     return feat_types
 
     
-    
+
+def get_search_result_table_from_ids(ids):
+    '''
+    Get a list of bioentry ids and return a list of objects to be served as json to a datatable visualizer
+    '''
+
+    data = []
+    for row in biodb(biodb.bioentry.bioentry_id.belongs(ids)).select(biodb.bioentry.accession,
+                                                                     biodb.bioentry.name,
+                                                                     biodb.bioentry.description,
+                                                                     biodb.bioentry.bioentry_id):
+        data.append([A(row.name,
+                       _href = URL(r=request, f= 'view.html', vars=dict(bioentry_id = row.bioentry_id)),
+                       _class = 'label'),
+                     row.accession,
+                     row.description])
+
+    return data
+
+
