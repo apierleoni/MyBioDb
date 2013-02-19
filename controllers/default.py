@@ -314,10 +314,10 @@ def view():
     else:
         toolbar_g1.append(TAG.button(TAG.i(_class="icon-star-empty"),_class="btn"))
     if editable:
-        toolbar_g1.append(TAG.button(TAG.i(_class="icon-edit"),_class="btn active"))
+        toolbar_g1.append(A(TAG.i(_class="icon-edit"),_class="btn active",_href = URL(r=request, vars = dict(bioentry_id = bioentry_id))))
         toolbar_g1.append(TAG.button(TAG.i(_class="icon-trash"),_class="btn"))
     else:
-        toolbar_g1.append(TAG.button(TAG.i(_class="icon-edit"),_class="btn"))
+        toolbar_g1.append(A(TAG.i(_class="icon-edit"),_class="btn",_href = URL(r=request, vars = dict(bioentry_id = bioentry_id, editable = True))))
     toolbar.append(toolbar_g1)
 
     toolbar_g2 = DIV(_class="btn-group")
