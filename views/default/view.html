@@ -2,6 +2,7 @@
 {{extend 'layout.html'}}
 
 
+{{=toolbar}}
 {{=main_content}}
 
 {{block left_sidebar}}
@@ -28,6 +29,8 @@
             }
         });
 
+
+    $('.dropdown-toggle').dropdown()
 
 
     $("div.jref .load-pubmed-data").live('click', function(){

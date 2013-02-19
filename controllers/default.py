@@ -289,7 +289,7 @@ def view():
     editable = False
     if request.vars.editable == 'True':
         editable = True
-    sidebar = UL(_class = "nav nav-list sidenav affix", _id = 'left-sidebar', **{"data-spy":"affix",})
+    sidebar = UL(_class = "nav nav-list sidenav affix nav-stacked", _id = 'left-sidebar', **{"data-spy":"affix",})
     if not request.vars.views:
         request.vars.views =  ['v_general', 'v_taxonomy', 'v_relationships',
                                'v_qualifiers','v_comments', 'v_sequence',
@@ -306,19 +306,34 @@ def view():
 
         sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key, _class = 'affix-element')))
 
-    toolbar = DIV()
-    if not editable:
-        toolbar.append(LI(A('Edit',
-                            _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id, editable = True))),
-                            _class = 'btn btn-primary btn-block'))
+    starred = False
+    toolbar = DIV(_class="btn-toolbar view-actions pull-right")
+    toolbar_g1 = DIV(_class="btn-group")
+    if starred:
+        toolbar_g1.append(TAG.button(TAG.i(_class="icon-star"),_class="btn"))
     else:
-        toolbar.append(LI(A('Done editing',
-                            _href=URL(r = request, f= 'view', vars =dict(bioentry_id =bioentry_id)),
-                            _class = 'btn btn-primary btn-block')))
+        toolbar_g1.append(TAG.button(TAG.i(_class="icon-star-empty"),_class="btn"))
+    if editable:
+        toolbar_g1.append(TAG.button(TAG.i(_class="icon-edit"),_class="btn active"))
+        toolbar_g1.append(TAG.button(TAG.i(_class="icon-trash"),_class="btn"))
+    else:
+        toolbar_g1.append(TAG.button(TAG.i(_class="icon-edit"),_class="btn"))
+    toolbar.append(toolbar_g1)
+
+    toolbar_g2 = DIV(_class="btn-group")
+    toolbar_g2.append(A(TAG.i(_class="icon-share"), ' Export', SPAN(_class="caret"),_class="btn dropdown-toggle", _href="#", **{'data-toggle':"dropdown"}))
+    toolbar_g2.append(UL(LI(A('FASTA', _href="#")),
+                         LI(A('Genbank', _href="#")),
+                         LI(A('Uniprot', _href="#")),
+                        _id="export-dropdown", _class="dropdown-menu"))
+    toolbar.append(toolbar_g2)
 
 
-
-    return dict(main_content = main_content, bioentry_id = bioentry_id, editable = editable, sidebar = sidebar, toolbar = toolbar)
+    return dict(main_content = main_content,
+                bioentry_id = bioentry_id,
+                editable = editable,
+                sidebar = sidebar,
+                toolbar = toolbar)
     
     
 def v_general():
