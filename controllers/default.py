@@ -357,9 +357,10 @@ def view():
 
     toolbar_g2 = DIV(_class="btn-group")
     toolbar_g2.append(A(TAG.i(_class="icon-share"), ' Export', SPAN(_class="caret"),_class="btn dropdown-toggle", _href="#", **{'data-toggle':"dropdown"}))
-    toolbar_g2.append(UL(LI(A('FASTA', _href="#")),
-                         LI(A('Genbank', _href="#")),
-                         LI(A('Uniprot', _href="#")),
+    toolbar_g2.append(UL(LI(A('FASTA', _href=URL(r=request, f= 'export_sequence', vars = dict(bioentry_id = bioentry_id, format = 'fasta')))),
+                         LI(A('Genbank', _href=URL(r=request, f= 'export_sequence', vars = dict(bioentry_id = bioentry_id, format = 'genbank')))),
+                         LI(A('EMBL', _href=URL(r=request, f= 'export_sequence', vars = dict(bioentry_id = bioentry_id, format = 'embl')))),
+                         LI(A('Raw sequence', _href=URL(r=request, f= 'export_sequence', vars = dict(bioentry_id = bioentry_id, format = 'raw')))),
                         _id="export-dropdown", _class="dropdown-menu"))
     toolbar.append(toolbar_g2)
 
@@ -975,6 +976,17 @@ def add_reference():
         return dict(main_content = UnitView(title = 'Add reference from PubMed',
                             content = content_body,))
 
+def export_sequence():
+    if request.vars.bioentry_id:
+        seqrec = biodb_handler._retrieve_seqrecord(int(request.vars.bioentry_id))
+        'Content-disposition: attachment; filename=movie.mpg'
+        response.headers['Content-Type'] = 'text/txt'
+        response.headers['Content-disposition'] = 'attachment; filename=%s.%s'%(seqrec.name,request.vars.format)
+        if request.vars.format == 'raw':
+            return seqrec.seq.tostring()
+        else:
+            return seqrec.format(request.vars.format)
+    return  dict()
 
 
 ## Static analyzer import helpers for controllers:
