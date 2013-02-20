@@ -5,6 +5,7 @@
 <small>{{=response.subtitle or ''}}</small>
 {{end}}
 
+<p class = "alert"> <strong>TEMPORARY:</strong> This is a temporary index page, just to develp</p>
 {{= DIV(UL(
         LI(A('Load an entry form local file', _href = URL(r = request, f = 'import_entry'))),
         LI(A('Load an entry remotely from UniProt', _href = URL(r = request, f = 'uniprot_remote_load'))),

@@ -331,7 +331,7 @@ def view():
                                'v_features', 'v_dbxrefs','v_references',   ]
     for view in request.vars.views:
         main_content.append(LOAD(c='default', f=view,
-                                 vars={'bioentry_id' : bioentry_id},
+                                 vars={'bioentry_id' : bioentry_id, 'editable' : request.vars.editable},
                                  ajax=False,
                                  ajaxTrap=True,
                                  content = IMG(_src = URL(request.application, 'static', 'ajax-loader.gif')),
@@ -483,7 +483,8 @@ def v_qualifiers():
                 else:
                     rank,value = q.rank2value.items()[0]
                     qualtbody.append(TR(TD(key), TD(SPAN(value, _class = 'edit-field-qualifier editable', _rank = rank))))
-                   
+            if request.vars.editable=='True':
+                pass
             #for k,v in sorted(qualifiers.simple_qualifiers.items()):
             #    qualtbody.append(TR(k,biosql_data_beautify(v)))
             qaltable.append(qualtbody)
@@ -524,16 +525,17 @@ def v_features():
             featbody.append(draw_single_feature(feat, seq_length, feat_id,))
         feattable.append(featbody)
         control_btn = DIV()
-        add_btn = A('Add new feature',
-                         _href = URL(r = request, 
-                                     f = 'add_feature', 
-                                     vars = dict(bioentry_id =request.vars.bioentry_id)),
-                         _class = 'btn')
-        control_btn.append(add_btn)
-        delete_btn = SPAN('Delete selected feature',
-            _id = 'feature-delete',
-            _class = 'btn disabled')
-        control_btn.append(delete_btn)
+        if request.vars.editable=='True':
+            add_btn = A('Add new feature',
+                             _href = URL(r = request,
+                                         f = 'add_feature',
+                                         vars = dict(bioentry_id =request.vars.bioentry_id)),
+                             _class = 'btn')
+            control_btn.append(add_btn)
+            delete_btn = SPAN('Delete selected feature',
+                _id = 'feature-delete',
+                _class = 'btn disabled')
+            control_btn.append(delete_btn)
         content = DIV(H4('Feature table'),feattable, control_btn)#, view_feature_dialog)
         return UnitView(title = 'Features',
                         content = content,
@@ -576,16 +578,17 @@ def v_dbxrefs():
                 dbxreftbody.append(draw_single_dbxref(*dbxref))
             dbxreftable.append(dbxreftbody)
             control_panel = DIV(_class = 'dbxref-control-panel')
-            add_btn = A('Add new dbxref',
-                         _href = URL(r = request,
-                                     f = 'add_dbxref',
-                                     vars = dict(bioentry_id =request.vars.bioentry_id)),
-                         _class = 'btn ')
-            control_panel.append(add_btn)
-            delete_btn = SPAN('Delete selected dbxref',
-                              _id = 'dbxref-delete',
-                              _class = 'btn disabled')
-            control_panel.append(delete_btn)
+            if request.vars.editable=='True':
+                add_btn = A('Add new dbxref',
+                             _href = URL(r = request,
+                                         f = 'add_dbxref',
+                                         vars = dict(bioentry_id =request.vars.bioentry_id)),
+                             _class = 'btn ')
+                control_panel.append(add_btn)
+                delete_btn = SPAN('Delete selected dbxref',
+                                  _id = 'dbxref-delete',
+                                  _class = 'btn disabled')
+                control_panel.append(delete_btn)
 
             content = DIV(dbxreftable,control_panel)
             return UnitView(title = 'Database cross-references (DBXrefs)',
@@ -615,12 +618,16 @@ def v_references():
                     year = ''
                 refstbody.append(TR(year, draw_single_reference(ref)))
             refstable.append(refstbody)
-            add_new = P(A('Add new reference',
-                         _href = URL(r = request, 
-                                     f = 'add_reference', 
-                                     vars = dict(bioentry_id =request.vars.bioentry_id)),
-                         _class = 'btn') )
-            content = DIV(refstable,add_new)
+            controldiv = DIV()
+            if request.vars.editable=='True':
+
+                add_new = P(A('Add new reference',
+                             _href = URL(r = request,
+                                         f = 'add_reference',
+                                         vars = dict(bioentry_id =request.vars.bioentry_id)),
+                             _class = 'btn') )
+                controldiv.append(add_new)
+            content = DIV(refstable,controldiv)
             return UnitView(title = 'References',
                             content = content,
                             counts =  len(refs.references),
