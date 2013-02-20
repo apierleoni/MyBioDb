@@ -56,7 +56,7 @@ def import_entry():
         i = 0
         for seqrec in SeqIO.parse(form.vars.file.file, form.vars.format):
             i+=1
-            print 'uploadin entry ', i
+            print 'uploading entry ', i  #used for debug remove in production code
             if i< Limits.max_entry_load:
                 try:
                     created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = form.vars.biodb)
@@ -70,10 +70,12 @@ def import_entry():
                                                                form.vars.biodb )
         if errors:
             response.flash += '| %i errors while loading'%len(errors)
-        returndiv = DIV(H3('Loaded entries:'))
-        for entry in created_seqrec:
-            returndiv.append(LI(A(entry[0], _href = URL(r=request, f = 'view', vars = dict(bioentry_id = entry[1])))))
-        if errors:
+        returndiv = DIV()
+        if created_seqrec and (len(created_seqrec) < 1000):
+            returndiv.append(H3('Loaded entries:'))
+            for entry in created_seqrec:
+                returndiv.append(LI(A(entry[0], _href = URL(r=request, f = 'view', vars = dict(bioentry_id = entry[1])))))
+        if errors and (len(errors) < 1000 ):
             returndiv.append(H3('Errors:'))
             for entry in errors:
                 returndiv.append(LI(entry[0],': ', entry[1]))
@@ -82,7 +84,7 @@ def import_entry():
 #                response.flash = 'PARSING FAILED: please check that all the entries are in the specified format'
 
 
-    return dict(form = form, )
+    return dict(form = form)
     
 
 def view_uniprot_entries():
