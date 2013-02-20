@@ -51,33 +51,37 @@ def import_entry():
         biodbs,BR(),
         INPUT(_type = 'submit', _value = 'upload'),)
     if form.accepts(request.vars, session):
-        try:
-            created_seqrec = []
-            errors =[]
-            try:
-                for seqrec in SeqIO.parse(form.vars.file.file, form.vars.format):
-                    try:
-                        created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = form.vars.biodb)
-                        created_seqrec.append((seqrec.id, created_seqrec_id))
-                    except Exception, e:
-                        errors.append((seqrec.id, e))
-                    response.flash = '%i entries correctly loaded on db %s'%(len(created_seqrec),
-                                                                           form.vars.biodb )
-                    if errors:
-                        response.flash += '| %i errors while loading'%len(errors)
-                    returndiv = DIV(H3('Loaded entries:'))
-                    for entry in created_seqrec:
-                        returndiv.append(LI(A(entry[0], _href = URL(r=request, f = 'view', vars = dict(bioentry_id = entry[1])))))
-                    if errors:
-                        returndiv.append(H3('Errors:'))
-                        for entry in errors:
-                            returndiv.append(LI(entry[0],': ', entry[1]))
-                    return dict(main_content = returndiv)
-            except:
-                response.flash = 'PARSING FAILED: please check that all the entries are in the specified format'
+        created_seqrec = []
+        errors =[]
+        i = 0
+        for seqrec in SeqIO.parse(form.vars.file.file, form.vars.format):
+            i+=1
+            print 'uploadin entry ', i
+            if i< Limits.max_entry_load:
+                try:
+                    created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = form.vars.biodb)
+                    created_seqrec.append((seqrec.id, created_seqrec_id))
+                    #biodb.commit()
+                except Exception, e:
+                    errors.append((seqrec.id, e))
+            else:
+                break
+        response.flash = '%i entries correctly loaded on db %s'%(len(created_seqrec),
+                                                               form.vars.biodb )
+        if errors:
+            response.flash += '| %i errors while loading'%len(errors)
+        returndiv = DIV(H3('Loaded entries:'))
+        for entry in created_seqrec:
+            returndiv.append(LI(A(entry[0], _href = URL(r=request, f = 'view', vars = dict(bioentry_id = entry[1])))))
+        if errors:
+            returndiv.append(H3('Errors:'))
+            for entry in errors:
+                returndiv.append(LI(entry[0],': ', entry[1]))
+        return dict(main_content = returndiv)
+#            except:
+#                response.flash = 'PARSING FAILED: please check that all the entries are in the specified format'
 
-        except Exception, e:
-            response.flash = 'Error: %s'%e.message
+
     return dict(form = form, )
     
 

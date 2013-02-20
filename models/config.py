@@ -5,6 +5,8 @@ class Limits(object):
     max_dbname_search=1000
     '''maximum number of results to report upon a search '''
     max_qualifier_search=10000
+    '''maximum number of entry loadable at one time'''
+    max_entry_load = 100000
 
 
 class CacheTimes(object):
