@@ -348,21 +348,22 @@ def get_search_result_table_from_ids(sql_query):
     '''
     Get a list of bioentry ids and return a list of objects to be served as json to a datatable visualizer
     Optimized for speed.
-    Table will be cached
+    Bypass web2py parsing and use directly executesql to get results.
     '''
     data = []
     bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
-    for row in biodb(biodb.bioentry.bioentry_id.belongs(sql_query)).select(biodb.bioentry.accession,
-                                                                     biodb.bioentry.name,
-                                                                     biodb.bioentry.description,
-                                                                     biodb.bioentry.bioentry_id,
-                                                                     limitby = (0,Limits.max_query_results),
-                                                                     cacheable=True):
-        data.append([A(row.name,
-                       _href = bioentry_link+str(row.bioentry_id),
+    query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
+                                                                            biodb.bioentry.name,
+                                                                            biodb.bioentry.description,
+                                                                            biodb.bioentry.bioentry_id,
+                                                                            limitby = (0,Limits.max_query_results),
+                                                                            cacheable=True)
+    for accession, name, description, bioentry_id in biodb.executesql(query):
+        data.append([A(name,
+                       _href = bioentry_link+str(bioentry_id),
                        _class = 'label'),
-                     row.accession,
-                     row.description])
+                     accession,
+                     description])
 
     return data
 
