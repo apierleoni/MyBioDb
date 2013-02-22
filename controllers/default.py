@@ -37,6 +37,30 @@ def uniprot_remote_load():
     return dict(form = form, )
 
 
+def local_import_huge():
+    created_seqrec = []
+    errors =[]
+    i= 0
+    from Bio import SeqIO
+    for seqrec in SeqIO.parse('yourpathto/uniprot_sprot.xml', 'uniprot-xml'):
+        i+=1
+        print 'uploading entry ', i,  #used for debug remove in production code
+        if i< Limits.max_entry_load:
+            try:
+                created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = 'UniProt')
+                created_seqrec.append((seqrec.id, created_seqrec_id))
+                print ' -> SUCCESS'
+            except Exception, e:
+                print ' -> ERROR: '+ e
+                errors.append((seqrec.id, e))
+            biodb.commit()
+        else:
+            break
+
+    print  '%i entries correctly loaded on db'%len(created_seqrec),
+    print '| %i errors while loading'%len(errors)
+
+
 def import_entry():
 
     from Bio import SeqIO
@@ -54,14 +78,21 @@ def import_entry():
         created_seqrec = []
         errors =[]
         i = 0
-        for seqrec in SeqIO.parse(form.vars.file.file, form.vars.format):
+        if form.vars.file.filename.endswith('gz') or form.vars.file.filename.endswith('zip'):
+            import zlib
+            file_handler = zlib.decompressobj(form.vars.file.file)
+
+        else:
+            file_handler = StringIO.StringIO(form.vars.file.file)
+        print 'handler created'
+        for seqrec in SeqIO.parse(file_handler, form.vars.format):
             i+=1
             print 'uploading entry ', i  #used for debug remove in production code
             if i< Limits.max_entry_load:
                 try:
                     created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = form.vars.biodb)
                     created_seqrec.append((seqrec.id, created_seqrec_id))
-                    #biodb.commit()
+                    biodb.commit()
                 except Exception, e:
                     errors.append((seqrec.id, e))
             else:
@@ -281,25 +312,24 @@ def _validate_query():
 
 def search_handler():
     '''initialize search object '''
+    from datetime import datetime
     if request.vars.biodatabase:
         search = BioSQLSearch(biodb_handler, biodatabase = biodatabase)
     else:
         search = BioSQLSearch(biodb_handler)
     data = []
     result_ids = []
+    starttime = datetime.now()      #debug REMOVE IN PRODUCTION
     if request.vars.query != None:
         query_obj =  search.quick
         result_count = query_obj.contains(request.vars.query)
         if result_count:
-            result_ids = query_obj.select()
-
-    if result_ids:
-        data.extend(get_search_result_table_from_ids(result_ids))
-
-    else:
-        data.append(['nothing found','',''])
-        data.append(['testing a1','a2','a3'])
-        data.append(['testing b1','b2','b3'])
+            result_sql = query_obj._select()
+    if result_count:
+        if result_count > Limits.max_query_results:
+            response.flash= '''WARNING: you query retrieved %i results, but only the first %i will be displayed. Please narrow your search to see other results'''%(result_count,Limits.max_query_results)
+        data.extend(get_search_result_table_from_ids(result_sql))
+        print 'populated table returned', datetime.now() - starttime     #debug REMOVE IN PRODUCTION
 
     return dict(aaData = data)
 
@@ -988,206 +1018,10 @@ def export_sequence():
             return seqrec.format(request.vars.format)
     return  dict()
 
+def upload_files():
+    '''
+    TODO: use the jQuery-File-Upload
 
-## Static analyzer import helpers for controllers:
-#if 0:
-#    import gluon
-#    from gluon.contrib.gql import GQLDB
-#    from gluon.html import A
-#    from gluon.html import B
-#    from gluon.html import BEAUTIFY
-#    from gluon.html import BODY
-#    from gluon.html import BR
-#    from gluon.html import CENTER
-#    from gluon.html import CLEANUP
-#    from gluon.html import CODE
-#    from gluon.html import CRYPT
-#    from gluon.html import DIV
-#    from gluon.html import FORM
-#    from gluon.html import I
-#    from gluon.html import IFRAME
-#    from gluon.html import IMG
-#    from gluon.html import INPUT
-#    from gluon.html import IS_ALPHANUMERIC
-#    from gluon.html import IS_DATE
-#    from gluon.html import IS_DATETIME
-#    from gluon.html import IS_DATETIME_IN_RANGE
-#    from gluon.html import IS_DATE_IN_RANGE
-#    from gluon.html import IS_DECIMAL_IN_RANGE
-#    from gluon.html import IS_EMAIL
-#    from gluon.html import IS_EMPTY_OR
-#    from gluon.html import IS_EQUAL_TO
-#    from gluon.html import IS_EXPR
-#    from gluon.html import IS_FLOAT_IN_RANGE
-#    from gluon.html import IS_IMAGE
-#    from gluon.html import IS_INT_IN_RANGE
-#    from gluon.html import IS_IN_DB
-#    from gluon.html import IS_IN_SET
-#    from gluon.html import IS_IPV4
-#    from gluon.html import IS_LENGTH
-#    from gluon.html import IS_LIST_OF
-#    from gluon.html import IS_LOWER
-#    from gluon.html import IS_MATCH
-#    from gluon.html import IS_NOT_EMPTY
-#    from gluon.html import IS_NOT_IN_DB
-#    from gluon.html import IS_NULL_OR
-#    from gluon.html import IS_SLUG
-#    from gluon.html import IS_STRONG
-#    from gluon.html import IS_TIME
-#    from gluon.html import IS_UPLOAD_FILENAME
-#    from gluon.html import IS_UPPER
-#    from gluon.html import IS_URL
-#    from gluon.html import LABEL
-#    from gluon.html import LEGEND
-#    from gluon.html import LI
-#    from gluon.html import LINK
-#    from gluon.html import MARKMIN
-#    from gluon.html import MENU
-#    from gluon.html import META
-#    from gluon.html import OBJECT
-#    from gluon.html import OL
-#    from gluon.html import ON
-#    from gluon.html import OPTGROUP
-#    from gluon.html import OPTION
-#    from gluon.html import P
-#    from gluon.html import PRE
-#    from gluon.html import SCRIPT
-#    from gluon.html import SELECT
-#    from gluon.html import SPAN
-#    from gluon.html import TABLE
-#    from gluon.html import TAG
-#    from gluon.html import TBODY
-#    from gluon.html import TD
-#    from gluon.html import TEXTAREA
-#    from gluon.html import TFOOT
-#    from gluon.html import TH
-#    from gluon.html import THEAD
-#    from gluon.html import TITLE
-#    from gluon.html import TR
-#    from gluon.html import TT
-#    from gluon.html import UL
-#    from gluon.html import URL
-#    from gluon.html import XHTML
-#    from gluon.html import XML
-#    from gluon.html import embed64
-#    from gluon.html import xmlescape
-#    from gluon.sql import SQLDB
-#    from gluon.sqlhtml import SQLFORM
-#    from gluon.sql import SQLField
-#    from gluon.sqlhtml import SQLTABLE
-#    from gluon.html import STYLE
-#    from gluon.http import redirect
-#    import gluon.languages.translator as T
-#    from gluon.tools import Auth
-#    from gluon.tools import Service
-#    global auth; auth = gluon.tools.Auth()
-#    global cache; cache = gluon.cache.Cache()
-#    global crud; crud = gluon.tools.Crud()
-#    global db; db = gluon.sql.DAL()
-#    import gluon.compileapp.local_import_aux as local_import
-#    global request; request = gluon.globals.Request()
-#    global response; response = gluon.globals.Response()
-#    global service; service = gluon.tools.Service()
-#    global session; session = gluon.globals.Session()
-#    global DAL; DAL = gluon.dal()
-#    global HTTP; HTTP = gluon.http()
-#    global LOAD; LOAD = gluon.compileapp.LoadFactory()
-#
-## Static analyzer import helpers for models:
-#if 0:
-#    None
-# import gluon
-# from gluon.contrib.gql import GQLDB
-# from gluon.html import A
-# from gluon.html import B
-# from gluon.html import BEAUTIFY
-# from gluon.html import BODY
-# from gluon.html import BR
-# from gluon.html import CENTER
-# from gluon.html import CLEANUP
-# from gluon.html import CODE
-# from gluon.html import CRYPT
-# from gluon.html import DIV
-# from gluon.html import FORM
-# from gluon.html import I
-# from gluon.html import IFRAME
-# from gluon.html import IMG
-# from gluon.html import INPUT
-# from gluon.html import IS_ALPHANUMERIC
-# from gluon.html import IS_DATE
-# from gluon.html import IS_DATETIME
-# from gluon.html import IS_DATETIME_IN_RANGE
-# from gluon.html import IS_DATE_IN_RANGE
-# from gluon.html import IS_DECIMAL_IN_RANGE
-# from gluon.html import IS_EMAIL
-# from gluon.html import IS_EMPTY_OR
-# from gluon.html import IS_EQUAL_TO
-# from gluon.html import IS_EXPR
-# from gluon.html import IS_FLOAT_IN_RANGE
-# from gluon.html import IS_IMAGE
-# from gluon.html import IS_INT_IN_RANGE
-# from gluon.html import IS_IN_DB
-# from gluon.html import IS_IN_SET
-# from gluon.html import IS_IPV4
-# from gluon.html import IS_LENGTH
-# from gluon.html import IS_LIST_OF
-# from gluon.html import IS_LOWER
-# from gluon.html import IS_MATCH
-# from gluon.html import IS_NOT_EMPTY
-# from gluon.html import IS_NOT_IN_DB
-# from gluon.html import IS_NULL_OR
-# from gluon.html import IS_SLUG
-# from gluon.html import IS_STRONG
-# from gluon.html import IS_TIME
-# from gluon.html import IS_UPLOAD_FILENAME
-# from gluon.html import IS_UPPER
-# from gluon.html import IS_URL
-# from gluon.html import LABEL
-# from gluon.html import LEGEND
-# from gluon.html import LI
-# from gluon.html import LINK
-# from gluon.html import MARKMIN
-# from gluon.html import MENU
-# from gluon.html import META
-# from gluon.html import OBJECT
-# from gluon.html import OL
-# from gluon.html import ON
-# from gluon.html import OPTGROUP
-# from gluon.html import OPTION
-# from gluon.html import P
-# from gluon.html import PRE
-# from gluon.html import SCRIPT
-# from gluon.html import SELECT
-# from gluon.html import SPAN
-# from gluon.html import TABLE
-# from gluon.html import TAG
-# from gluon.html import TBODY
-# from gluon.html import TD
-# from gluon.html import TEXTAREA
-# from gluon.html import TFOOT
-# from gluon.html import TH
-# from gluon.html import THEAD
-# from gluon.html import TITLE
-# from gluon.html import TR
-# from gluon.html import TT
-# from gluon.html import UL
-# from gluon.html import URL
-# from gluon.html import XHTML
-# from gluon.html import XML
-# from gluon.html import embed64
-# from gluon.html import xmlescape
-# from gluon.sql import SQLDB
-# from gluon.sqlhtml import SQLFORM
-# from gluon.sql import SQLField
-# from gluon.sqlhtml import SQLTABLE
-# from gluon.html import STYLE
-# from gluon.http import redirect
-# import gluon.languages.translator as T
-# global cache; cache = gluon.cache.Cache()
-# import gluon.compileapp.local_import_aux as local_import
-# global request; request = gluon.globals.Request()
-# global response; response = gluon.globals.Response()
-# global session; session = gluon.globals.Session()
-# global DAL; DAL = gluon.dal()
-# global HTTP; HTTP = gluon.http()
-# global LOAD; LOAD = gluon.compileapp.LoadFactory()
+    simple documentation at https://github.com/blueimp/jQuery-File-Upload/wiki/Basic-plugin
+    '''
+    return
