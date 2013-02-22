@@ -1605,7 +1605,7 @@ class BioSQLHandler(object):
             Field('name_class','string',length=32, notnull = True,),
             migrate = create_tables,
             fake_migrate = FAKE_MIGRATE,
-            #primarykey=[],
+            primarykey=['taxon_id', 'name','name_class'],
             sequence_name = None)
         if create_tables:
             if self.dbtype in alter_db_list: 
@@ -1851,7 +1851,7 @@ class BioSQLHandler(object):
             Field('distance','integer', ),
             migrate = create_tables,
             fake_migrate = FAKE_MIGRATE,
-            #primarykey=[],
+            primarykey=['object_bioentry_id', 'subject_bioentry_id', 'term_id', 'distance'],
             sequence_name = None)
         if create_tables:
             if self.dbtype in alter_db_list: 
