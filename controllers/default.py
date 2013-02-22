@@ -38,6 +38,7 @@ def uniprot_remote_load():
 
 
 def local_import_huge():
+    '''used to quickly load a big db for testing'''
     created_seqrec = []
     errors =[]
     i= 0
@@ -51,9 +52,10 @@ def local_import_huge():
                 created_seqrec.append((seqrec.id, created_seqrec_id))
                 print ' -> SUCCESS'
             except Exception, e:
-                print ' -> ERROR: '+ e
+                print ' -> ERROR:', e
                 errors.append((seqrec.id, e))
-            biodb.commit()
+            if i%100 == 0:
+                biodb.commit()
         else:
             break
 
