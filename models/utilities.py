@@ -165,7 +165,7 @@ def create_dbxref_link(dbname, accession, dbxref_id):
     Dlinks ={'ccds': 'http://www.ncbi.nlm.nih.gov/projects/CCDS/CcdsBrowse.cgi?REQUEST=ALLFIELDS&DATA=%s',
              'cdd': 'http://www.ncbi.nlm.nih.gov/sites/entrez/query.fcgi?db=cdd&term=%s',
              'embl': 'http://www.ebi.ac.uk/cgi-bin/sva/sva.pl/?search=Go!&query=%s',
-             'ensembl': 'http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=%s',
+             'ensembl': 'http://www.ensembl.org/Gene/Summary?g=%s',
              'ensg': 'http://www.ensembl.org/Homo_sapiens/Gene/Summary?g=%s',
              'ensp': 'http://www.ensembl.org/Homo_sapiens/Transcript/ProteinSummary?p=%s',
              'enst': 'http://www.ensembl.org/Homo_sapiens/Transcript/Summary?t=%s',
