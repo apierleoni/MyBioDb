@@ -50,8 +50,10 @@
 <li>BioPython</li>
 <li>web2py</li>
 <li>bootstrap and JQuery</li>
-</ul><h2>Install</h2>
+</ul>
 
+
+<h2>Install</h2>
 <ul>
 <li>clone this repo into a web2py application folder</li>
 <li>launch web2py: <code>python web2py.py</code>
@@ -59,8 +61,9 @@
 <li>if running locally go to <a href="http://localhost:8000/MyBioDb">http://localhost:8000/MyBioDb</a>
 </li>
 <li>enjoy</li>
-</ul><h2>What can you do with MyBioDb?</h2>
+</ul>
 
+<h2>What can you do with MyBioDb?</h2>
 <ul>
 <li>load entries (from local or remote source) in any BioPython supported format to a BioSQL database</li>
 <li>view each entry with full CRUD options</li>
@@ -69,6 +72,19 @@
 <li>entry versioning</li>
 <li>admin page for management</li>
 </ul>
+
+
+<h2>How can I use it with my BioSQL db?</h2>
+<ul>
+<li>edit the connection string on `/modules/biodb.py`</li>
+<li>currently tested with SQLite and MySQL, has some issue with postgres</li>
+
+<h2>What if I don't have a BioSQL db? Wait, what is a BioSQL db?</h2>
+<ul>
+<li>take a look at <a href = "http://www.biosql.org/wiki/Main_Page">this</a></li>
+<li>don't worry MyBioSQL will create a BioSQL database for you (but depending on the backend you use it could be not 100% identical to one created with the offical BioSQL sql)</li>
+<li>by default MyBioSQL will use a local SQLite db </li>
+
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/apierleoni">apierleoni</a></p>
