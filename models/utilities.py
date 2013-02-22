@@ -344,20 +344,20 @@ def return_feature_type_select(biosqldb):
 
     
 
-def get_search_result_table_from_ids(ids):
+def get_search_result_table_from_ids(sql_query):
     '''
     Get a list of bioentry ids and return a list of objects to be served as json to a datatable visualizer
     Optimized for speed.
     Table will be cached
     '''
-
     data = []
     bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
-    for row in biodb(biodb.bioentry.bioentry_id.belongs(ids)).select(biodb.bioentry.accession,
+    for row in biodb(biodb.bioentry.bioentry_id.belongs(sql_query)).select(biodb.bioentry.accession,
                                                                      biodb.bioentry.name,
                                                                      biodb.bioentry.description,
                                                                      biodb.bioentry.bioentry_id,
-                                                                     cache=(cache.ram, CacheTimes.search)):
+                                                                     limitby = (0,Limits.max_query_results),
+                                                                     cacheable=True):
         data.append([A(row.name,
                        _href = bioentry_link+str(row.bioentry_id),
                        _class = 'label'),

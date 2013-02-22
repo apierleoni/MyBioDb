@@ -42,7 +42,7 @@ class BioSQLQuery(object):
         if fields == ['bioentry_id']:
             ids = self.adaptor(self.biodbquery & self.query).select(self.adaptor.bioentry.bioentry_id,
                                                                     groupby = self.adaptor.bioentry.bioentry_id, 
-                                                                    cache=(cache.ram, CacheTimes.search))
+                                                                    cacheable=True)
         results = []
         try:
             results = [row.id for row in ids]
@@ -53,6 +53,13 @@ class BioSQLQuery(object):
             return set(results)
         else:
             return results
+
+    def _select(self, mode = 'list', fields = ['bioentry_id']):
+        if fields == ['bioentry_id']:
+            sql = self.adaptor(self.biodbquery & self.query)._select(self.adaptor.bioentry.bioentry_id,
+                groupby = self.adaptor.bioentry.bioentry_id,
+                cacheable=True)
+            return sql
         
     def count(self,):
         return self.adaptor(self.biodbquery & self.query).count()
@@ -1421,7 +1428,7 @@ BioSQLQueryTaxon ---> ritornare tutte le bientry facendo un check dell'albero di
                                    abdb_handler.adaptor.bioentry.name,
                                    abdb_handler.adaptor.bioentry.description,
                                    abdb_handler.adaptor.biosequence.length,
-                                   cache=(cache.ram, CacheTimes.search))
+                                   cacheable=True)
 
 
         elif request.vars.type=='titletext':
@@ -1436,7 +1443,7 @@ BioSQLQueryTaxon ---> ritornare tutte le bientry facendo un check dell'albero di
                                    abdb_handler.adaptor.bioentry.name,
                                    abdb_handler.adaptor.bioentry.description,
                                    abdb_handler.adaptor.biosequence.length,
-                                   cache=(cache.ram, CacheTimes.search))
+                                   cacheable=True)
 '''
 
 class BioSQLSearch(object):

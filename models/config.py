@@ -1,6 +1,6 @@
 class Limits(object):
     '''maximum number of results to report upon a search '''
-    max_query_results=2000
+    max_query_results=50000
     '''maximum number of results to report upon a search '''
     max_dbname_search=1000
     '''maximum number of results to report upon a search '''
