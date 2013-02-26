@@ -321,7 +321,7 @@ def fetch_pubmed_data(pmid):
             raise Exception('Please set an email to use ncbi services')
     
     Entrez.email = ncbiemail
-    Entrez.tool = 'web2biopy'
+    Entrez.tool = 'mybiodb'
 
     try:
         entrez_response=Medline.parse( Entrez.efetch(db="pubmed", id=pmid, rettype="medline",retmode="text",)).next()
@@ -344,27 +344,6 @@ def return_feature_type_select(biosqldb):
 
     
 
-def get_search_result_table_from_ids(sql_query):
-    '''
-    Get a list of bioentry ids and return a list of objects to be served as json to a datatable visualizer
-    Optimized for speed.
-    Bypass web2py parsing and use directly executesql to get results.
-    '''
-    data = []
-    bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
-    query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
-                                                                            biodb.bioentry.name,
-                                                                            biodb.bioentry.description,
-                                                                            biodb.bioentry.bioentry_id,
-                                                                            limitby = (0,Limits.max_query_results),
-                                                                            cacheable=True)
-    for accession, name, description, bioentry_id in biodb.executesql(query):
-        data.append([A(name,
-                       _href = bioentry_link+str(bioentry_id),
-                       _class = 'label'),
-                     accession,
-                     description])
 
-    return data
 
 

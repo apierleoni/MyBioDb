@@ -1418,11 +1418,11 @@ class BioSQLHandler(object):
     '''
     
     def __init__(self, 
-                 conn_string='postgres://postgres:bioseq@10.0.6.95/biosqldb', 
+                 conn_string,
                  fetch_NCBI_taxonomy=False, 
                  compatibility_mode = False,
                  time_stamps = False,
-                 pool_size = 1):    
+                 pool_size = 5):
         '''compatibility_mode makes seqrecord upload similar to biopython, thus relationships are uploaded as annotation (useful for archive purpose)
         time_stamps is set to a connection string to enable timestamps'''
         

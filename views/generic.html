@@ -14,3 +14,9 @@ It is used as default when a view is not provided for your controllers
 {{if request.is_local:}}
 {{=response.toolbar()}}
 {{pass}}
+<h2>biodb-timings just to develop</h2>
+{{
+for item in biodb._timings:
+=SPAN(BEAUTIFY(item),_class = 'alert alert-info')
+pass
+}}
