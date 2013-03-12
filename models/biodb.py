@@ -1,4 +1,3 @@
-
 '''Initialize biosql db '''
 biodb_conn_string = 'sqlite://biodb.sqlite'
 #biodb_conn_string = 'mysql://root:@127.0.0.1/mybiodb'

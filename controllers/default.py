@@ -43,7 +43,7 @@ def local_import_huge():
     errors =[]
     i= 0
     from Bio import SeqIO
-    for seqrec in SeqIO.parse('yourpathto/uniprot_sprot.xml', 'uniprot-xml'):
+    for seqrec in SeqIO.parse('/Users/pierleonia/Downloads/uniprot/uniprot_sprot.xml', 'uniprot-xml'):
         i+=1
         print 'uploading entry ', i,  #used for debug remove in production code
         if i< Limits.max_entry_load:
@@ -85,7 +85,7 @@ def import_entry():
             file_handler = zlib.decompressobj(form.vars.file.file)
 
         else:
-            file_handler = StringIO.StringIO(form.vars.file.file)
+            file_handler = form.vars.file.file            
         print 'handler created'
         for seqrec in SeqIO.parse(file_handler, form.vars.format):
             i+=1
@@ -164,16 +164,17 @@ def view():
                                'v_qualifiers','v_comments', 'v_sequence',
                                'v_features', 'v_dbxrefs','v_references',   ]
     for view in request.vars.views:
-        main_content.append(LOAD(c='default', f=view,
+        view_return = LOAD(c='default', f=view,
                                  vars={'bioentry_id' : bioentry_id, 'editable' : request.vars.editable},
                                  ajax=False,
                                  ajaxTrap=True,
                                  content = IMG(_src = URL(request.application, 'static', 'ajax-loader.gif')),
                                  #content = '',
-                                 ))
-        view_key = ''.join(view.split('v_')[1:])
-
-        sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key, _class = 'affix-element')))
+                                 )
+        main_content.append(view_return)
+        if view_return.flatten() != '<div></div>':
+            view_key = ''.join(view.split('v_')[1:])
+            sidebar.append(LI(A(' '+view_key, TAG.i(_class="icon-chevron-right"),_href='#'+view_key, _class = 'affix-element')))
 
     starred = False
     toolbar = DIV(_class="btn-toolbar view-actions pull-right")
