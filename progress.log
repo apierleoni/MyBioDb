@@ -1,0 +1,16 @@
+[2013-02-23 21:46:14] START
+[2013-02-23 21:46:14] EDIT MyBioDb/models/config.py: 0
+[2013-03-05 15:09:20] EDIT MyBioDb/models/biodb.py: 0
+[2013-03-05 15:11:44] EDIT MyBioDb/controllers/default.py: 0
+[2013-03-12 09:39:57] EDIT MyBioDb/models/biodb.py: 0
+[2013-03-12 09:41:20] EDIT MyBioDb/controllers/default.py: 1
+[2013-03-12 09:44:40] EDIT MyBioDb/controllers/default.py: 1
+[2013-03-12 09:45:35] EDIT MyBioDb/controllers/default.py: -2
+[2013-03-12 09:45:56] EDIT MyBioDb/controllers/default.py: 0
+[2013-03-12 10:00:39] EDIT MyBioDb/controllers/default.py: 2
+[2013-03-12 10:01:28] EDIT MyBioDb/controllers/default.py: 1
+[2013-03-12 10:06:58] EDIT MyBioDb/controllers/default.py: 0
+[2013-03-12 10:07:55] EDIT MyBioDb/controllers/default.py: 3
+[2013-03-12 10:08:18] EDIT MyBioDb/controllers/default.py: 0
+[2013-03-12 10:11:05] EDIT MyBioDb/controllers/default.py: -3
+[2013-03-12 10:12:08] EDIT MyBioDb/controllers/default.py: -1
