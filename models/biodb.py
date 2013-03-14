@@ -1,6 +1,6 @@
 '''Initialize biosql db '''
-biodb_conn_string = 'sqlite://biodb.sqlite'
-#biodb_conn_string = 'mysql://root:@127.0.0.1/mybiodb'
+#biodb_conn_string = 'sqlite://biodb.sqlite'
+biodb_conn_string = 'mysql://root:@127.0.0.1/mybiodb'
 #biodb_conn_string = 'postgres://mybiodb:mypass@127.0.0.1/mybiodb'
 timestamps_db = 'sqlite://biodb.sqlite'
 biodb_handler = BioSQLHandler(biodb_conn_string, compatibility_mode = False, time_stamps = timestamps_db, pool_size = 5)

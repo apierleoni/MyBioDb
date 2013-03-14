@@ -205,9 +205,9 @@ def get_typehead_results(sql_query, maxresult):
         #cacheable=True,
     )
     for accession, name, description, bioentry_id in biodb.executesql(query):
-        data.append(A(SPAN(name,_class='typeahead-value')+" [%s]"%accession,
+        data.append(A(name+" [%s]"%accession,
             _href = bioentry_link+str(bioentry_id),
-            #_class = 'label',
+            _class = 'typeahead-item',
                      ),
                      )
 
