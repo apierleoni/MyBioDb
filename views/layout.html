@@ -88,7 +88,7 @@
         </div><!--/.nav-collapse -->
           <div class="span3 pull-right">
               <form class="navbar-search" action="{{=URL(r=request, c='search',  f='index')}}" enctype="multipart/form-data" method="post">
-                  <input type="text" class="search-query span2" placeholder="Search" name="query">
+                  <input type="text" class="search-query span2 search-typeahead" placeholder="Search" name="query" data-provide="typeahead">
                   <div class="icon-search"></div>
               </form>
           </div>
@@ -154,6 +154,22 @@
        (Placed at the end of the document so the pages load faster) -->
   <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
   <script src="{{=URL('static','js/web2py_bootstrap.js')}}"></script>
+  
+  <script type="text/javascript">
+  $('.search-typeahead').typeahead({
+    source: function (query, process) {
+        return $.get('{{=URL(r=request, c="search", f="typeahead.json")}}', { query: query }, function (data) {
+            return process(data.options);
+        });
+        },
+      minLenght: 3,
+      updater: function(item){      	
+      	var div = document.createElement("div");
+		div.innerHTML = item;
+      	return div.textContent.split(' [')[0];
+      }
+    });
+  </script>
   <!--[if lt IE 7 ]>
       <script src="{{=URL('static','js/dd_belatedpng.js')}}"></script>
       <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
@@ -169,4 +185,3 @@
   <script src="{{=URL('static','js/share.js',vars=dict(static=URL('static','images')))}}"></script>
 </body>
 </html>
-

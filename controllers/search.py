@@ -122,8 +122,18 @@ $(document).ready(function(){
         return dict(content_body= form)
 
 
-
-
+def typeahead():
+    result_count = 0
+    maxresult = 8
+    if request.vars.query:
+        search = BioSQLSearch(biodb_handler)
+        query_obj =  search.quick
+        result_count = query_obj.contains(request.vars.query)
+        if result_count:
+            result_sql = query_obj._select()
+            return dict(options = get_typehead_results(result_sql, maxresult))
+    
+    
 def search_handler():
     '''initialize search object '''
     session.forget(response)
@@ -180,7 +190,28 @@ def get_search_result_table_from_ids(sql_query):
 
     return data
 
+def get_typehead_results(sql_query, maxresult):
+    '''
+    
 
+    '''
+    data = []
+    bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
+    query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
+        biodb.bioentry.name,
+        biodb.bioentry.description,
+        biodb.bioentry.bioentry_id,
+        limitby = (0,maxresult),
+        #cacheable=True,
+    )
+    for accession, name, description, bioentry_id in biodb.executesql(query):
+        data.append(A(SPAN(name,_class='typeahead-value')+" [%s]"%accession,
+            _href = bioentry_link+str(bioentry_id),
+            #_class = 'label',
+                     ),
+                     )
+
+    return data
 
 def _validate_query():
 
