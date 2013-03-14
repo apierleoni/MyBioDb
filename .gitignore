@@ -10,3 +10,5 @@ errors
 uploads
 databases
 .idea*
+
+*.log
