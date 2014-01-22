@@ -126,12 +126,15 @@ def typeahead():
     result_count = 0
     maxresult = 8
     if request.vars.query:
-        search = BioSQLSearch(biodb_handler)
-        query_obj =  search.quick
-        result_count = query_obj.contains(request.vars.query)
-        if result_count:
-            result_sql = query_obj._select()
-            return dict(options = get_typehead_results(result_sql, maxresult))
+        biodb_query = index_bioentry.simple_search(request.vars.query)
+        return dict(options = get_typehead_results(biodb_query, maxresult))
+
+        #search = BioSQLSearch(biodb_handler)
+        #query_obj =  search.quick
+        #result_count = query_obj.contains(request.vars.query)
+        #if result_count:
+        #    result_sql = query_obj._select()
+        #    return dict(options = get_typehead_results(result_sql, maxresult))
     
     
 def search_handler():
@@ -139,7 +142,7 @@ def search_handler():
     session.forget(response)
     from datetime import datetime
     if request.vars.biodatabase:
-        search = BioSQLSearch(biodb_handler, biodatabase = biodatabase)
+        search = BioSQLSearch(biodb_handler, biodatabase = request.vars.biodatabase)
     else:
         search = BioSQLSearch(biodb_handler)
     data = []
@@ -173,7 +176,7 @@ def get_search_result_table_from_ids(sql_query):
 
     '''
     data = []
-    bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
+    bioentry_link = URL(r=request, c = 'default', f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
     query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
         biodb.bioentry.name,
         biodb.bioentry.description,
@@ -197,7 +200,8 @@ def get_typehead_results(sql_query, maxresult):
     '''
     data = []
     bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
-    query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
+    #query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
+    query =  biodb(sql_query)._select(biodb.bioentry.accession,
         biodb.bioentry.name,
         biodb.bioentry.description,
         biodb.bioentry.bioentry_id,
@@ -269,6 +273,21 @@ def _validate_query():
                 query_count = query_obj.count()
             return query_count
         except NotImplementedError:
-            return SPAN('Wrong operator', _style = 'color:#970000;')
+            return SPAN('Wrong operator', _style='color:#970000;')
     else:
         return 0
+
+
+def search_haystack():
+    query = request.vars.query
+
+    biodb_query = index_bioentry.simple_search(query)
+    return dict(results=biodb(biodb_query).select())
+
+
+def rebuild_haystack():
+    index_bioentry.rebuild()
+    return dict(message = "index rebuilt")
+
+def allbioentry():
+    return dict(results=biodb(biodb['bioentry'].id>0).select())

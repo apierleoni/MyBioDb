@@ -392,11 +392,11 @@ class BioSQLFeature(BaseBioSQL):
                 strand = None
             if strand not in (+1, -1, None):
                 raise ValueError("Invalid strand %s found in database for " \
-                                 "seqfeature_id %s" % (strand, seqfeature_id))
+                                 "seqfeature_id %s" % (strand, location_id))
             if end < start:
                 import warnings
                 warnings.warn("Inverted location start/end (%i and %i) for " \
-                              "seqfeature_id %s" % (start, end, seqfeature_id))
+                              "seqfeature_id %s" % (start, end, location_id))
             self.locations.append( (location_id, start, end, strand) )
             
             
@@ -438,12 +438,12 @@ class BioSQLFeature(BaseBioSQL):
             self.feature.ref_db = dbname
             self.feature.ref = version
         else:
-            assert feature.sub_features == []
-            for location in locations:
+            assert self.feature.sub_features == []
+            for location in self.locations:
                 location_id, start, end, strand = location
-                dbname, version = lookup.get(location_id, (None, None))
+                dbname, version = self.ref_lookup.get(location_id, (None, None))
                 subfeature = SeqFeature.SeqFeature()
-                subfeature.type = seqfeature_type
+                subfeature.type = self.feature.type
                 subfeature.location_operator = \
                     self.handler._retrieve_location_qualifier_value(location_id)
                 #TODO - See Bug 2677 - we don't yet record location_operator,
@@ -459,7 +459,7 @@ class BioSQLFeature(BaseBioSQL):
             # Assuming that the feature loc.op is the same as the sub_feature
             # loc.op:
             self.feature.location_operator = \
-                feature.sub_features[0].location_operator
+                self.feature.sub_features[0].location_operator
             # Locations are in order, but because of remote locations for
             # sub-features they are not necessarily in numerical order:
             start = self.locations[0][1]

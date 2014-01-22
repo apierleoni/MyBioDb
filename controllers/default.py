@@ -185,7 +185,7 @@ def view():
         toolbar_g1.append(TAG.button(TAG.i(_class="icon-star-empty"),_class="btn"))
     if editable:
         toolbar_g1.append(A(TAG.i(_class="icon-edit"),_class="btn active",_href = URL(r=request, vars = dict(bioentry_id = bioentry_id))))
-        toolbar_g1.append(TAG.button(TAG.i(_class="icon-trash"),_class="btn"))
+        toolbar_g1.append(A(TAG.button(TAG.i(_class="icon-trash"),_class="btn"),_href = URL(r=request, f='delete_bioentry',vars = dict(bioentry_id = bioentry_id))))
     else:
         toolbar_g1.append(A(TAG.i(_class="icon-edit"),_class="btn",_href = URL(r=request, vars = dict(bioentry_id = bioentry_id, editable = True))))
     toolbar.append(toolbar_g1)
@@ -771,7 +771,7 @@ def add_qualifier():
     return dict(main_content = UnitView(title = 'Add qualifier',
                         content = content_body,))
 def add_dbxref():
-    content_body=DIV(TODO)
+    content_body=DIV("TODO")
     return dict(main_content = UnitView(title = 'Add database cross reference',
                         content = content_body,))
 def add_reference():

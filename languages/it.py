@@ -209,6 +209,7 @@
 'Time in Cache (h:m:s)': 'Time in Cache (h:m:s)',
 'Timestamp': 'Ora (timestamp)',
 'too short': 'too short',
+'Traceback': 'Traceback',
 'TSV (Excel compatible)': 'TSV (Excel compatible)',
 'TSV (Excel compatible, hidden cols)': 'TSV (Excel compatible, hidden cols)',
 'Twitter': 'Twitter',
