@@ -33,7 +33,7 @@
     $('.dropdown-toggle').dropdown()
 
 
-    $("div.jref .load-pubmed-data").live('click', function(){
+    $(document).on('click', "div.jref .load-pubmed-data", function(){
         var impatharray = window.location.href.split('/');
         target = $(this).parent()
         impatharray.pop();
@@ -54,7 +54,7 @@
     });
 
 
-    $("div.jref .control-pubmed-data").live('click', function(){
+    $(document).on('click',"div.jref .control-pubmed-data", function(){
         target = $(this).parent().parent().find('.jref-additional-data').slideToggle();
         var text = $(this).html();
         $(this).html(

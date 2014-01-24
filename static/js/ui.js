@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    $("div.collapsible div.unitview-header").live('click', function(){
+    $(document).on('click',"div.collapsible div.unitview-header", function(){
         $(this).parent().find('.unitview-content').slideToggle(); 
         $(this).parent().find('.footer').slideToggle();
         $(this).parent().find('.unitview-counter').fadeToggle(); 
