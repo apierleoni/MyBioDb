@@ -6,12 +6,13 @@
     //--></script>
 
 {{
-response.files.insert(1,URL('static','js/jquery.js'))
+response.files.insert(1,"//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
 response.files.insert(2,URL('static','js/bootstrap.min.js'))
 response.files.insert(3,URL('static','css/anytime.css'))
 response.files.insert(4,URL('static','js/anytime.js'))
 response.files.insert(5,URL('static','js/web2py.js'))
-#response.files.insert(6,URL('static','css/custom-theme/jquery-ui-1.10.0.custom.css'))
+response.files.insert(6,URL('static','js/web2py_bootstrap.js'))
+#response.files.insert(6,"//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"))
 #response.files.insert(7,URL('static','js/jquery-ui-1.10.0.custom.min.js'))
 #response.files.insert(8,URL('static','css/jquery.dataTables_themeroller.css'))
 response.files.insert(8,URL('static','css/jquery.dataTables.css'))
@@ -26,6 +27,8 @@ response.files.insert(14,URL('static','bootstrap-editable/css/bootstrap-editable
 response.files.insert(15,URL('static','bootstrap-editable/js/bootstrap-editable.min.js'))
 response.files.insert(16,URL('static','js/bootstrapx-clickover.js'))
 response.files.insert(16,URL('static','js/jquery-dynamic-form.js'))
+response.files.insert(17,URL('static','js/typeahead.min.js'))
+
 response.include_meta()
 response.include_files()
-}}
+}}}}

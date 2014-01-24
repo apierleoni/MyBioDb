@@ -1273,7 +1273,7 @@ class BioSQLBioentryAnnotations(BaseBioSQL):
     that will be reported as a seqrecord annotation of a given
     bioentry_id '''
          
-    def __init__(self, handler, bioentry_id, taxon_id = None):
+    def __init__(self, handler, bioentry_id):
         
         BaseBioSQL.__init__(self, handler = handler)
         self.bioentry_id = bioentry_id
@@ -1369,7 +1369,7 @@ class BioSQLBioentry(BaseBioSQL):
         else:
             self.seqrec_id = self.accession
 
-        self.seq = BioSQLBioentrySeq(bioentry_id)
+        self.seq = BioSQLSeq(bioentry_id)
         try:
             length = len(self.seqrec_seq)
         except:#Could be no sequence in the database!
@@ -1377,7 +1377,7 @@ class BioSQLBioentry(BaseBioSQL):
         self.per_letter_annotations = _RestrictedDict(length=length) # not handled in biopython
         self.dbxrefs = BioSQLBioentryDBXrefs(bioentry_id)
         self.features = BioSQLBioentryFeatures(bioentry_id)
-        self.annotations = BioSQLBioentryAnnotations(bioentry_id, taxon_id)
+        self.annotations = BioSQLBioentryAnnotations(bioentry_id)
 
         self.seqrecord=SeqRecord(self.seq.export(), id = self.seqrec_id, name = self.name, description = self.description)
         self.seqrecord.dbxrefs = self.dbxrefs.export()

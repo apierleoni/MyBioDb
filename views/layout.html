@@ -37,6 +37,7 @@
   <!-- All JavaScript at the bottom, except for Modernizr which enables
        HTML5 elements & feature detects -->
   <script src="{{=URL('static','js/modernizr.custom.js')}}"></script>
+<script src='http://twitter.github.io/hogan.js/builds/2.0.0/hogan-2.0.0.js'></script>
 
   <!-- include stylesheets -->
   {{  
@@ -81,14 +82,14 @@
 
         <ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
         <div class="nav-collapse">
-          {{is_mobile=request.user_agent().is_mobile}}
+          {{is_mobile=request.user_agent()['is_mobile']}}
           {{if response.menu:}}
           {{=MENU(response.menu, _class='mobile-menu nav' if is_mobile else 'nav',mobile=is_mobile,li_class='dropdown',ul_class='dropdown-menu')}}
           {{pass}}
         </div><!--/.nav-collapse -->
           <div class="span3 pull-right">
-              <form class="navbar-search" action="{{=URL(r=request, c='search',  f='index')}}" enctype="multipart/form-data" method="post">
-                  <input type="text" class="search-query span2 search-typeahead" placeholder="Search" name="query" data-provide="typeahead">
+              <form class="navbar-search" action="{{=URL(r=request, c='search',  f='index', vars = dict(search_engine=True))}}" enctype="multipart/form-data" method="post">
+                  <input type="text" class="search-query tt-query span2 quick-search-typeahead" placeholder="Search" name="query" autocomplete="on">
                   <div class="icon-search"></div>
               </form>
           </div>
@@ -152,24 +153,28 @@
 
   <!-- The javascript =============================================
        (Placed at the end of the document so the pages load faster) -->
-  <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
-  <script src="{{=URL('static','js/web2py_bootstrap.js')}}"></script>
+
   
   <script type="text/javascript">
-  $('.search-typeahead').typeahead({
-    source: function (query, process) {
-        return $.get('{{=URL(r=request, c="search", f="typeahead.json")}}', { query: query }, function (data) {
-            return process(data.options);
-        });
-        },
-      minLenght: 3,
-      updater: function(item){      	
-      	var div = document.createElement("div");
-		div.innerHTML = item;
-      	return div.textContent.split(' [')[0];
-      }
-    });
+  $('input.quick-search-typeahead').typeahead({
+            name: 'entries',
+            remote: '{{=URL(r=request, c="search", f="typeahead.json")}}?q=%QUERY',
+            minLength: 3, // send AJAX request only after user type in at least 3 characters
+            limit: 10, // limit to show only 10 results
+            cache:true,
+            template:'<p class="typeahead-item">{{=_b}}name{{=_e}} - {{=_b}}accession{{=_e}}</p>',
+            engine: Hogan
+
+        }
+    );
+
   </script>
+
+
+
+
+
+
   <!--[if lt IE 7 ]>
       <script src="{{=URL('static','js/dd_belatedpng.js')}}"></script>
       <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>

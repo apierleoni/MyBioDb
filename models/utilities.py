@@ -2,6 +2,10 @@
 Reusable portions of code, to be used by all controllers
 '''
 
+#helpersto use in html templates
+_b='{{'
+_e='}}'
+
 
 def draw_sequence(sequence, mode = 'simple', alphabet = None):
         

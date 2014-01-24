@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: utf-8
 {
 '!=': '!=',
 '!langcode!': 'it',
@@ -205,6 +205,7 @@
 'The output of the file is a dictionary that was rendered by the view %s': 'L\'output del file è un "dictionary" che è stato visualizzato dalla vista %s',
 'The Views': 'The Views',
 'This App': 'This App',
+'This email already has an account': 'This email already has an account',
 'This is a copy of the scaffolding application': "Questa è una copia dell'applicazione di base (scaffold)",
 'Time in Cache (h:m:s)': 'Time in Cache (h:m:s)',
 'Timestamp': 'Ora (timestamp)',

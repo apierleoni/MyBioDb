@@ -123,41 +123,74 @@ $(document).ready(function(){
 
 
 def typeahead():
-    result_count = 0
     maxresult = 8
-    if request.vars.query:
-        biodb_query = index_bioentry.simple_search(request.vars.query)
-        return dict(options = get_typehead_results(biodb_query, maxresult))
+    if request.vars.q:
+        if len(request.vars.q)>=3:
+            query = request.vars.q
+            if not query.endswith('*'):
+                query+='*'
+            biodb_query = biodb_index.search(query,
+                                             limit=maxresult,
+                                             scored=True,
+                                             fieldnames = ['accession',
+                                                           'description',
+                                                           'name']).db_query
 
-        #search = BioSQLSearch(biodb_handler)
-        #query_obj =  search.quick
-        #result_count = query_obj.contains(request.vars.query)
-        #if result_count:
-        #    result_sql = query_obj._select()
-        #    return dict(options = get_typehead_results(result_sql, maxresult))
-    
+            data =  get_typehead_results(biodb_query, maxresult)
+            import json
+            return json.dumps(data)
+    return ""
+
+def get_typehead_results(sql_query, maxresult):
+    '''
+
+
+    '''
+    data = []
+    bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
+    #query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
+    query =  biodb(sql_query)._select(biodb.bioentry.accession,
+        biodb.bioentry.name,
+        biodb.bioentry.description,
+        biodb.bioentry.bioentry_id,
+        limitby = (0,maxresult),
+        #cacheable=True,
+    )
+    for accession, name, description, bioentry_id in biodb.executesql(query):
+        data.append(dict(value = name,
+                         accession = accession,
+                         description = description,
+                         bioentry_id = bioentry_id,
+                         name = name) )
+
+    return data
     
 def search_handler():
     '''initialize search object '''
     session.forget(response)
     from datetime import datetime
-    if request.vars.biodatabase:
-        search = BioSQLSearch(biodb_handler, biodatabase = request.vars.biodatabase)
-    else:
-        search = BioSQLSearch(biodb_handler)
+
     data = []
     result_ids = []
     starttime = datetime.now()      #debug REMOVE IN PRODUCTION
     if request.vars.query != None:
-        query_obj =  search.quick
-        result_count = query_obj.contains(request.vars.query)
-        if result_count:
-            result_sql = query_obj._select()
+        if request.vars.search_engine:
+             search_result = biodb_index.search(request.vars.query, limit=Limits.max_query_results, scored=True)
+             result_count = search_result.count
+             result_sql = search_result.selected_ids
+        else:
+            if request.vars.biodatabase:
+                search = BioSQLSearch(biodb_handler, biodatabase = request.vars.biodatabase)
+            else:
+                search = BioSQLSearch(biodb_handler)
+            query_obj =  search.quick
+            result_count = query_obj.contains(request.vars.query)
+            if result_count:
+                result_sql = query_obj._select()
     if result_count:
         if result_count > Limits.max_query_results:
             response.flash= '''WARNING: you query retrieved %i results, but only the first %i will be displayed. Please narrow your search to see other results'''%(result_count,Limits.max_query_results)
         data.extend(get_search_result_table_from_ids(result_sql))
-        print 'populated table returned', datetime.now() - starttime     #debug REMOVE IN PRODUCTION
 
 
     return dict(aaData = data)
@@ -193,29 +226,7 @@ def get_search_result_table_from_ids(sql_query):
 
     return data
 
-def get_typehead_results(sql_query, maxresult):
-    '''
-    
 
-    '''
-    data = []
-    bioentry_link = URL(r=request, f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
-    #query =  biodb(biodb.bioentry.bioentry_id.belongs(sql_query))._select(biodb.bioentry.accession,
-    query =  biodb(sql_query)._select(biodb.bioentry.accession,
-        biodb.bioentry.name,
-        biodb.bioentry.description,
-        biodb.bioentry.bioentry_id,
-        limitby = (0,maxresult),
-        #cacheable=True,
-    )
-    for accession, name, description, bioentry_id in biodb.executesql(query):
-        data.append(A(name+" [%s]"%accession,
-            _href = bioentry_link+str(bioentry_id),
-            _class = 'typeahead-item',
-                     ),
-                     )
-
-    return data
 
 def _validate_query():
 
@@ -277,17 +288,24 @@ def _validate_query():
     else:
         return 0
 
+#
+#def search_haystack():
+#    query = request.vars.query
+#
+#    biodb_query = index_bioentry.simple_search(query)
+#    return dict(results=biodb(biodb_query).select())
+#
+#
+#def rebuild_haystack():
+#    index_bioentry.rebuild()
+#    return dict(message = "index rebuilt")
+#
+#def allbioentry():
+#    return dict(results=biodb(biodb['bioentry'].id>0).select())
 
-def search_haystack():
+
+def search_engine():
     query = request.vars.query
 
-    biodb_query = index_bioentry.simple_search(query)
-    return dict(results=biodb(biodb_query).select())
-
-
-def rebuild_haystack():
-    index_bioentry.rebuild()
-    return dict(message = "index rebuilt")
-
-def allbioentry():
-    return dict(results=biodb(biodb['bioentry'].id>0).select())
+    search_result = biodb_index.search(query)
+    return dict(results=biodb(search_result.db_query).select())

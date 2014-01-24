@@ -40,6 +40,7 @@ $(document).ready(function() {
                 "bInfo": true,
                 "bAutoWidth": true ,
                 "bDeferRender": true,
+                "oLanguage": { "sSearch": "Filter:" }
             });
     });
 
@@ -55,7 +56,9 @@ $(document).ready(function() {
             "bInfo": true,
             "bAutoWidth": true ,
             "bDeferRender": true,
-            "aaSorting": []
+            "aaSorting": [],
+            "oLanguage": { "sSearch": "Filter:" }
+
         });
     });
 
@@ -71,7 +74,8 @@ $(document).ready(function() {
                 "bInfo": true,
                 "bAutoWidth": true ,
                 "bDeferRender": true,
-                "aaSorting": [[ 0, "desc" ]]
+                "aaSorting": [[ 0, "desc" ]],
+                "oLanguage": { "sSearch": "Filter:" }
             });
     });
     
@@ -113,5 +117,8 @@ $(document).ready(function() {
     $('[data-spy="scroll"]').each(function () {
         var $spy = $(this).scrollspy('refresh')
     });
+
+
+
 
 });

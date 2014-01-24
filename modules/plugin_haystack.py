@@ -118,7 +118,7 @@ class WhooshBackend(SimpleBackend):
             schema = Schema(id=ID(unique=True,stored=True),
                             **dict((k,TEXT) for k in fieldnames))
             self.ix = create_in(self.indexdir, schema, indexname=self.indexname)
-            self.rebuild()
+            #self.rebuild()
     def after_insert(self,fields,id):
         if DEBUG: print 'after insert',fields,id
         writer = self.ix.writer()
