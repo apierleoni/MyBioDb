@@ -38,6 +38,14 @@ class SearchEngineResult(object):
         self.select_sql = self.biodb(self.biodb.bioentry.id.belongs(ids))._select() #raw sql to retrieve data from the bioentry table
 
 
+def getCPUs():
+    import multiprocessing
+    try:
+        return multiprocessing.cpu_count()
+    except:
+        return 1
+
+
 class WhooshBackend(BioentrySearchEngineBackend):
     def __init__(self, handler, indexdir):
         self.handler = handler
@@ -62,6 +70,9 @@ class WhooshBackend(BioentrySearchEngineBackend):
                             accession=KEYWORD(scorable=True),
                             identifier=ID(stored=True),
                             description=TEXT(stored=True),
+                            taxonomy=KEYWORD(lowercase=True,
+                                            commas=True,
+                                            scorable=True),
                             keyword=KEYWORD(lowercase=True,
                                             commas=True,
                                             scorable=True),
@@ -85,24 +96,48 @@ class WhooshBackend(BioentrySearchEngineBackend):
                                             scorable=True),
                             )
             self.ix = create_in(self.indexdir, schema, indexname=self.indexname)
-    def rebuild(self, **kwargs):
-        writer = self.ix.writer()
-        bioentries =  kwargs.get('bientry_ids',[])
-        if not bioentries:
-            bioentries = [row.id for row in self.biodb(self.biodb.bioentry.id >0).select(self.biodb.bioentry.id)]
-        for row in self.biodb(self.biodb.bioentry.id.belongs(bioentries)).select():
-            try:
-                seqrecord = self.handler._retrieve_seqrecord(row.bioentry_id)
-                writer.update_document(id = unicode(row.id),
-                                       db = unicode(self.biodb.biodatabase[row.biodatabase_id].name),
-                                       **self.map_to_index(seqrecord))
-            except:
-                if DEBUG:
-                    print "error building index for id: ",row.id
-                    traceback.print_exc()
 
+    def rebuild(self, **kwargs):
+        cpus = getCPUs()
+        writer = self.ix.writer(procs=cpus, multisegment=True)
+        bioentries =  kwargs.get('bientry_ids',[])
+        if DEBUG: print "starting global index rebuilding with %i CPUs"%cpus
+        if not bioentries:
+            bioentries = [row.id for row in self.biodb(self.biodb.bioentry.id >0
+                                                      ).select(self.biodb.bioentry.id)]
+        if DEBUG: print "starting indexing of %i bioentries"%len(bioentries)
+        #iterate over all bioentries at 100 max a time
+        i, m = 0, 1000
+        while True:
+            start = i*m
+            end = (i+1)*m
+            if DEBUG:
+                print "searching for round ",start,end
+                #print "searching query: " + self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end]))._select()
+
+            rows = self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end])).select()
+            #if DEBUG: print "round size found: ",len(rows)
+
+            for row in rows:
+                try:
+                    #if DEBUG: print "Indexing bioentry %s - %i"%(row.name, i+1)
+                    seqrecord = self.handler._retrieve_seqrecord(row.bioentry_id)
+                    writer.update_document(id = unicode(row.id),
+                                           db = unicode(self.biodb.biodatabase[row.biodatabase_id].name),
+                                           **self.map_to_index(seqrecord))
+                    #if DEBUG:
+                    #    print "Indexed bioentry %s - %i"%(row.name, start)
+                except:
+                    if DEBUG:
+                        print "error building index for id: ",row.id
+                        traceback.print_exc()
+
+            if len(rows)<m: break
+            i+=1
         writer.commit()
-    def map_to_index(self, seqrecord):
+
+
+    def map_to_index(self, seqrecord): #TODO: add taxonomy parsing
 
         def add_element(element, container):
             if isinstance(element,str):
