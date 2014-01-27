@@ -88,9 +88,10 @@
           {{pass}}
         </div><!--/.nav-collapse -->
           <div class="span3 pull-right">
-              <form class="navbar-search" action="{{=URL(r=request, c='search',  f='index', vars = dict(search_engine=True))}}" enctype="multipart/form-data" method="post">
-                  <input type="text" class="search-query tt-query span2 quick-search-typeahead" placeholder="Search" name="query" autocomplete="on">
+              <form  id = "global-search" class="navbar-search" action="{{=URL(r=request, c='search',  f='index', vars = dict(search_engine=True))}}" enctype="multipart/form-data" method="post">
+                  <input type="text" id = "global-search-input" class="search-query tt-query span2 quick-search-typeahead" placeholder="Search" name="query" autocomplete="on">
                   <div class="icon-search"></div>
+                  <input type="submit" style="visibility: hidden; position: fixed;" />
               </form>
           </div>
       </div>
@@ -156,7 +157,7 @@
 
   
   <script type="text/javascript">
-  $('input.quick-search-typeahead').typeahead({
+  $('#global-search-input').typeahead({
             name: 'entries',
             remote: '{{=URL(r=request, c="search", f="typeahead.json")}}?q=%QUERY',
             minLength: 3, // send AJAX request only after user type in at least 3 characters
