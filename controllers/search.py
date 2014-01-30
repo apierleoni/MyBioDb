@@ -175,7 +175,7 @@ def search_handler():
     starttime = datetime.now()      #debug REMOVE IN PRODUCTION
     if request.vars.query != None:
         if request.vars.search_engine:
-             search_result = biodb_index.search(request.vars.query, limit=Limits.max_query_results, scored=True)
+             search_result = biodb_index.search(request.vars.query, limit=settings.max_query_results, scored=True)
              result_count = search_result.count
              result_sql = search_result.selected_ids
         else:
@@ -188,8 +188,8 @@ def search_handler():
             if result_count:
                 result_sql = query_obj._select()
     if result_count:
-        if result_count > Limits.max_query_results:
-            response.flash= '''WARNING: you query retrieved %i results, but only the first %i will be displayed. Please narrow your search to see other results'''%(result_count,Limits.max_query_results)
+        if result_count > settings.max_query_results:
+            response.flash= '''WARNING: you query retrieved %i results, but only the first %i will be displayed. Please narrow your search to see other results'''%(result_count,settings.max_query_results)
         data.extend(get_search_result_table_from_ids(result_sql))
 
 

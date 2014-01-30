@@ -17,3 +17,18 @@ settings.email_login = ''
 settings.login_method = 'local'
 settings.login_config = ''
 settings.plugins = []
+
+
+#MyBioDb specific settings
+settings.search_engine = 'whoosh' # available choices: 'whoosh','solr', None
+settings.solr_uri = 'http://10.25.25.124::8983'
+'''seconds to store a query in cache '''
+settings.search_cache_type = 300
+'''maximum number of results to report upon a search '''
+settings.max_query_results=500000
+'''maximum number of results to report upon a search '''
+settings.max_dbname_search=1000
+'''maximum number of results to report upon a search '''
+settings.max_qualifier_search=10000
+'''maximum number of entry loadable at one time'''
+settings.max_entry_load = 1000000

@@ -1,3 +1,4 @@
+
 __author__ = 'pierleonia'
 
 DEBUG=True
@@ -25,8 +26,72 @@ class BioentrySearchEngineBackend(object):
 
     def search(self, query, **kwargs):
         raise NotImplementedError()
-    def map_to_index(self, seqrecord):
-        pass
+
+    def map_to_index(self,handler, bioentry_id):
+
+        def add_element(element, container):
+            if isinstance(element,str):
+                    container.append(unicode(element))
+            elif isinstance(element,list):
+                for i in element:
+                    if isinstance(i, list):
+                        container.append(unicode(i[0]))
+                    elif isinstance(i, str):
+                        container.append(unicode(i))
+            return container
+
+        seqrecord = handler._retrieve_seqrecord(bioentry_id)
+        annotation_types, annotation_values = [],[]
+        feature_types, feature_values = [],[]
+        comments = []
+        accessions = []
+        keywords = []
+        pubids, pubauths, pubtitles, pubjournals= [],[],[],[]
+        taxonomy = [] #TODO: add taxonomy
+
+        for k,v in seqrecord.annotations.items():
+            if k == 'accessions':
+                accessions = add_element(v,accessions)
+            elif k.startswith('comment'):
+                comments = add_element(v,comments)
+            elif k == 'keywords':
+                keywords = add_element(v,keywords)
+            elif k=='references':
+                if isinstance(v,list):
+                    for ref in v:
+                        pubids.append(ref.pubmed_id)
+                        pubtitles.append(ref.title)
+                        pubauths.append(ref.authors.strip())
+                        pubjournals.append(ref.journal)
+
+            else:
+                annotation_values = add_element(v,annotation_values)
+                annotation_types = add_element(k,annotation_types)
+        for feature in seqrecord.features:
+            feature_types.append(feature.type)
+            for k,v in feature.qualifiers.items():
+                feature_values = add_element(v,feature_values)
+
+        kwargs = dict(id = unicode(bioentry_id),
+                      db = unicode(handler.adaptor.biodatabase[handler.adaptor.bioentry[bioentry_id].biodatabase_id].name),
+                      name=unicode(seqrecord.name),
+                      accession=accessions,
+                      identifier=unicode(seqrecord.id),
+                      description=unicode(seqrecord.description),
+                      keyword=keywords,
+                      annotation=annotation_values,
+                      annotationtype=annotation_types,
+                      comment=comments,
+                      feature=feature_values,
+                      featuretype=feature_types,
+                      lenght=unicode(len(seqrecord)),
+                      dbxref=seqrecord.dbxrefs,
+                      pubid=pubids,
+                      pubtitle=pubtitles,
+                      pubauth=pubauths,
+                      pubjournal=pubjournals)
+        return kwargs
+
 
 
 class SearchEngineResult(object):
@@ -46,7 +111,12 @@ def getCPUs():
         return 1
 
 
+
+
+
 class WhooshBackend(BioentrySearchEngineBackend):
+
+
     def __init__(self, handler, indexdir):
         self.handler = handler
         self.biodb = handler.adaptor
@@ -56,15 +126,72 @@ class WhooshBackend(BioentrySearchEngineBackend):
     def indexes(self):
         try:
             from whoosh.index import create_in,open_dir
-            from whoosh.fields import Schema, TEXT, ID, KEYWORD, NUMERIC
-            from whoosh.analysis import StemmingAnalyzer
         except ImportError:
             raise ImportError("Cannot find Whoosh")
         self.indexname =".".join([self.biodb._uri_hash, 'whoosh'])
         try:
             self.ix = open_dir(self.indexdir, indexname=self.indexname)
         except:
-            schema = Schema(id=ID(unique=True,stored=True),
+            self.ix = create_in(self.indexdir, self._get_schema(), indexname=self.indexname)
+
+    def rebuild(self, **kwargs):
+        cpus = getCPUs()
+        writer = self.ix.writer(procs=cpus, multisegment=True)
+        bioentries =  kwargs.get('bientry_ids',[])
+        if DEBUG: print "starting global index rebuilding with %i CPUs"%cpus
+        if not bioentries:
+            bioentries = [row.id for row in self.biodb(self.biodb.bioentry.id >0
+                                                      ).select(self.biodb.bioentry.id)]
+        if DEBUG: print "starting indexing of %i bioentries"%len(bioentries)
+        #iterate over all bioentries at 100 max a time
+        i, m = 0, 1000
+        while True:
+            start = i*m
+            end = (i+1)*m
+            if DEBUG:
+                print "searching for round ",start,end
+                #print "searching query: " + self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end]))._select()
+
+            rows = self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end])).select(self.biodb.bioentry.id)
+            #if DEBUG: print "round size found: ",len(rows)
+
+            for row in rows:
+                try:
+                    #if DEBUG: print "Indexing bioentry %s - %i"%(row.name, i+1)
+                    writer.update_document(**self.map_to_index(self.handler,row.id))
+                    #if DEBUG:
+                    #    print "Indexed bioentry %s - %i"%(row.name, start)
+                except:
+                    if DEBUG:
+                        print "error building index for id: ",row.id
+                        traceback.print_exc()
+
+            if len(rows)<m: break
+            i+=1
+        writer.commit()
+
+
+
+    def search(self, query, **kwargs):
+
+        from whoosh.qparser import QueryParser,MultifieldParser
+
+        fieldnames =  kwargs.pop('fieldnames', self.ix.schema.names())
+        qp = MultifieldParser( fieldnames, schema=self.ix.schema)
+        q = qp.parse(query)
+        with self.ix.searcher() as s:
+            results = s.search(q, **kwargs)
+            if DEBUG: print "found %i hits in %.2fms"%(len(results.top_n),results.runtime*1000)
+            ids = list(set(long(result['id']) for result in results))
+
+        result = SearchEngineResult(ids, self.handler)
+        return result
+        #return ids
+
+    def _get_schema(self):
+        from whoosh.fields import Schema, TEXT, ID, KEYWORD, NUMERIC
+        from whoosh.analysis import StemmingAnalyzer
+        return Schema(id=ID(unique=True,stored=True),
                             db=ID(stored=True),
                             name=ID(stored=True),
                             accession=KEYWORD(scorable=True),
@@ -95,124 +222,90 @@ class WhooshBackend(BioentrySearchEngineBackend):
                                             commas=True,
                                             scorable=True),
                             )
-            self.ix = create_in(self.indexdir, schema, indexname=self.indexname)
 
-    def rebuild(self, **kwargs):
-        cpus = getCPUs()
-        writer = self.ix.writer(procs=cpus, multisegment=True)
+    def map_to_index(self, handler, bioentry_id):
+        documents = super(WhooshBackend, self).map_to_index(handler, bioentry_id)
+
+        for k,v in documents.items():
+            if isinstance(v, list):
+                documents[k]=unicode(" ".join(v))
+        return documents
+
+class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
+
+
+    def __init__(self, handler, url="http://localhost:8983",schema=""):
+
+        from StringIO import StringIO
+        self.handler = handler
+        self.biodb = handler.adaptor
+        self.url = url
+        if not schema:
+            schema = self._get_default_schema()
+        self.schemadoc = schema
+        if DEBUG: print schema
+
+    def _get_default_schema(self):
+        from gluon import request
+
+        return os.path.join(request.folder, 'databases', 'solr_schema.xml')
+
+
+    def indexes(self):
+        import sunburnt
+        if 1:
+        # try:
+            self.interface = sunburnt.SolrInterface(self.url, self.schemadoc)
+        # except:
+        #     raise RuntimeError("Cannot connect to Solr: %s" % self.url)
+
+
+    def rebuild(self, bioentry_ids=[], **kwargs):
         bioentries =  kwargs.get('bientry_ids',[])
-        if DEBUG: print "starting global index rebuilding with %i CPUs"%cpus
+        if DEBUG: print "starting global index rebuilding"
         if not bioentries:
             bioentries = [row.id for row in self.biodb(self.biodb.bioentry.id >0
                                                       ).select(self.biodb.bioentry.id)]
         if DEBUG: print "starting indexing of %i bioentries"%len(bioentries)
         #iterate over all bioentries at 100 max a time
-        i, m = 0, 1000
+        i, m = 0, 100
         while True:
             start = i*m
             end = (i+1)*m
             if DEBUG:
                 print "searching for round ",start,end
-                #print "searching query: " + self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end]))._select()
-
-            rows = self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end])).select()
-            #if DEBUG: print "round size found: ",len(rows)
-
+            rows = self.biodb(self.biodb.bioentry.id.belongs(bioentries[start:end])).select(self.biodb.bioentry.id)
+            documents = []
             for row in rows:
                 try:
-                    #if DEBUG: print "Indexing bioentry %s - %i"%(row.name, i+1)
-                    seqrecord = self.handler._retrieve_seqrecord(row.bioentry_id)
-                    writer.update_document(id = unicode(row.id),
-                                           db = unicode(self.biodb.biodatabase[row.biodatabase_id].name),
-                                           **self.map_to_index(seqrecord))
-                    #if DEBUG:
-                    #    print "Indexed bioentry %s - %i"%(row.name, start)
+                    documents.append(self.map_to_index(self.handler,row.id))
                 except:
                     if DEBUG:
                         print "error building index for id: ",row.id
                         traceback.print_exc()
-
+            self.interface.add(documents)
             if len(rows)<m: break
             i+=1
-        writer.commit()
 
+        self.interface.commit()
 
-    def map_to_index(self, seqrecord): #TODO: add taxonomy parsing
-
-        def add_element(element, container):
-            if isinstance(element,str):
-                    container.append(element)
-            elif isinstance(element,list):
-                for i in element:
-                    if isinstance(i, list):
-                        container.append(i[0])
-                    elif isinstance(i, str):
-                        container.append(i)
-            return container
-
-        annotation_types, annotation_values = [],[]
-        feature_types, feature_values = [],[]
-        comments = []
-        accessions = []
-        keywords = []
-        pubids, pubauths, pubtitles, pubjournals= [],[],[],[]
-
-        for k,v in seqrecord.annotations.items():
-            if k == 'accessions':
-                accessions = add_element(v,accessions)
-            elif k.startswith('comment'):
-                comments = add_element(v,comments)
-            elif k == 'keywords':
-                keywords = add_element(v,keywords)
-            elif k=='references':
-                if isinstance(v,list):
-                    for ref in v:
-                        pubids.append(ref.pubmed_id)
-                        pubtitles.append(ref.title)
-                        pubauths.append(ref.authors.strip())
-                        pubjournals.append(ref.journal)
-
-            else:
-                annotation_values = add_element(v,annotation_values)
-                annotation_types = add_element(k,annotation_types)
-        for feature in seqrecord.features:
-            feature_types.append(feature.type)
-            for k,v in feature.qualifiers.items():
-                feature_values = add_element(v,feature_values)
-
-        kwargs = dict(name=unicode(seqrecord.name),
-                    accession=unicode(" ".join(accessions)),
-                    identifier=unicode(seqrecord.id),
-                    description=unicode(seqrecord.description),
-                    keyword=unicode(",".join(keywords)),
-                    annotation=unicode( " ".join(annotation_values)),
-                    annotationtype=unicode(",".join(annotation_types)),
-                    comment=unicode(" ".join(comments)),
-                    feature=unicode(" ".join(feature_values)),
-                    featuretype=unicode(",".join(feature_types)),
-                    lenght=unicode(len(seqrecord)),
-                    dbxref=unicode(" ".join(seqrecord.dbxrefs)),
-                    pubid=unicode(",".join(pubids)),
-                    pubtitle=unicode(" ".join(pubtitles)),
-                    pubauth=unicode(",".join(pubauths)),
-                    pubjournal=unicode(",".join(pubjournals)))
-        return kwargs
 
     def search(self, query, **kwargs):
+        # results = self.interface.query(**fieldkeys).paginate(0,limit)
+        # ids = [r['id'] for r in results]
+        # return ids
 
-        from whoosh.qparser import QueryParser,MultifieldParser
+        return super(SolrBackend, self).search(query, **kwargs)
 
-        fieldnames =  kwargs.pop('fieldnames', self.ix.schema.names())
-        qp = MultifieldParser( fieldnames, schema=self.ix.schema)
-        q = qp.parse(query)
-        with self.ix.searcher() as s:
-            results = s.search(q, **kwargs)
-            if DEBUG: print "found %i hits in %.2fms"%(len(results.top_n),results.runtime*1000)
-            ids = list(set(long(result['id']) for result in results))
 
-        result = SearchEngineResult(ids, self.handler)
-        return result
-        #return ids
+    def map_to_index(self, handler, bioentry_id):
+        document = super(SolrBackend, self).map_to_index(handler, bioentry_id)
+        try:
+            document['lenght'] = int(document['lenght'])
+        except:
+            pass
+        return document
+
 
 class BioentrySearchEngine(object):
     def __init__(self,handler, backend=WhooshBackend,**kwargs):

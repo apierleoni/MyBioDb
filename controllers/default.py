@@ -46,7 +46,7 @@ def local_import_huge():
     for seqrec in SeqIO.parse('/Users/pierleonia/Downloads/uniprot/uniprot_sprot.xml', 'uniprot-xml'):
         i+=1
         print 'uploading entry ', i,  #used for debug remove in production code
-        if i< Limits.max_entry_load:
+        if i< settings.max_entry_load:
             try:
                 created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = 'UniProt')
                 created_seqrec.append((seqrec.id, created_seqrec_id))
@@ -90,7 +90,7 @@ def import_entry():
         for seqrec in SeqIO.parse(file_handler, form.vars.format):
             i+=1
             print 'uploading entry ', i  #used for debug remove in production code
-            if i< Limits.max_entry_load:
+            if i< settings.max_entry_load:
                 try:
                     created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = form.vars.biodb)
                     created_seqrec.append((seqrec.id, created_seqrec_id))
