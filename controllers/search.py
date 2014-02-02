@@ -127,14 +127,9 @@ def typeahead():
     if request.vars.q:
         if len(request.vars.q)>=3:
             query = request.vars.q
-            if not query.endswith('*'):
+            if not '*' in query:
                 query+='*'
-            biodb_query = biodb_index.search(query,
-                                             limit=maxresult,
-                                             scored=True,
-                                             fieldnames = ['accession',
-                                                           'description',
-                                                           'name']).db_query
+            biodb_query = biodb_index.quick_search(query, maxresult).db_query
 
             data =  get_typehead_results(biodb_query, maxresult)
             import json

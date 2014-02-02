@@ -27,6 +27,9 @@ class BioentrySearchEngineBackend(object):
     def search(self, query, **kwargs):
         raise NotImplementedError()
 
+    def quick_search(self, query):
+        raise NotImplementedError()
+
     def map_to_index(self,handler, bioentry_id):
 
         def add_element(element, container):
@@ -96,6 +99,7 @@ class BioentrySearchEngineBackend(object):
 
 class SearchEngineResult(object):
     def __init__(self, ids, handler):
+
         self.biodb = handler.adaptor
         self.db_query = self.biodb.bioentry._id.belongs(ids) # to be used in DAL queries
         self.selected_ids = ids
@@ -231,7 +235,21 @@ class WhooshBackend(BioentrySearchEngineBackend):
                 documents[k]=unicode(" ".join(v))
         return documents
 
-class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
+    def quick_search(self, query, limit = 0):
+        if limit > 0:
+            return self.search(query, limit = limit,
+                                 scored=True,
+                                 fieldnames = ['accession',
+                                               'description',
+                                               'name'])
+        else:
+            return self.search(query,scored=True,
+                                 fieldnames = ['accession',
+                                               'description',
+                                               'name'])
+
+
+class SolrBackend(BioentrySearchEngineBackend):
 
 
     def __init__(self, handler, url="http://localhost:8983",schema=""):
@@ -243,9 +261,9 @@ class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
         if not schema:
             schema = self._get_default_schema()
         self.schemadoc = schema
-        if DEBUG: print schema
+        # if DEBUG: print schema
 
-    def _get_default_schema(self):
+    def _get_default_schema(self):#TODO: update schema.xml to make strings not case sensitive
         from gluon import request
 
         return os.path.join(request.folder, 'databases', 'solr_schema.xml')
@@ -253,11 +271,14 @@ class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
 
     def indexes(self):
         import sunburnt
-        if 1:
-        # try:
+        # import pysolr
+        # if 1:
+        try:
             self.interface = sunburnt.SolrInterface(self.url, self.schemadoc)
-        # except:
-        #     raise RuntimeError("Cannot connect to Solr: %s" % self.url)
+        except:
+            raise RuntimeError("Cannot connect to Solr: %s" % self.url)
+
+        # self.interface = pysolr.Solr(self.url)
 
 
     def rebuild(self, bioentry_ids=[], **kwargs):
@@ -284,6 +305,7 @@ class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
                         print "error building index for id: ",row.id
                         traceback.print_exc()
             self.interface.add(documents)
+            # self.interface.add_many(documents)
             if len(rows)<m: break
             i+=1
 
@@ -295,7 +317,43 @@ class SolrBackend(BioentrySearchEngineBackend): #TODO: implement Solr backend
         # ids = [r['id'] for r in results]
         # return ids
 
-        return super(SolrBackend, self).search(query, **kwargs)
+
+        fieldnames =  kwargs.pop('fieldnames', self.interface.schema.fields.keys())
+        search_all_fields =  kwargs.pop('search_all_fields', False)
+        if search_all_fields:
+            fieldnames = self.interface.schema.fields.keys()
+        qd = dict()
+        fields = self.interface.schema.fields
+        for fname in fieldnames:
+            field = fields[fname]
+            if getattr(field, "class") == 'solr.StrField' :
+                qd[fname] = query
+
+            elif getattr(field, "class") == 'solr.TriIntField' :
+                try:
+                    qd[fname] = int(query)
+                except:
+                    pass
+
+
+        results = self.interface.query(**qd).field_limit("id") .execute()#TODO: modify to get the OR by default
+        if DEBUG: print "found %i hits in %.2fms"%(len(results),results.QTime)
+
+        ids = list(set(long(result['id']) for result in results))
+
+        result = SearchEngineResult(ids, self.handler)#TODO: return the stored data to avoid querying the db again if possible. use a Storage object and try to get the required fields, otherwise fallback to db query.
+        return result
+
+    def quick_search(self, query, limit = 0):
+        if limit > 0:
+            return self.search(query,rows=limit,
+                                 fieldnames = ['accession',
+                                               'description',
+                                               'name'])
+        else:
+            return self.search(query,fieldnames = ['accession',
+                                               'description',
+                                               'name'])
 
 
     def map_to_index(self, handler, bioentry_id):
@@ -324,3 +382,5 @@ class BioentrySearchEngine(object):
         self.backend.rebuild( **kwargs)
     def search(self, query, **kwargs):
         return self.backend.search(query, **kwargs)
+    def quick_search(self, query, limit = 0):
+        return self.backend.quick_search(query, limit)
