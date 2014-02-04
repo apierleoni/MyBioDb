@@ -4,10 +4,11 @@ __author__ = 'pierleonia'
 DEBUG=True
 
 import os, traceback
+from multiprocessing import Pool
 
 class BioentrySearchEngineBackend(object):
 
-    def rebuild(self, bioentry_ids, **kwargs):
+    def rebuild(self, bioentry_ids=[], **kwargs):
         raise NotImplementedError()
     def indexes(self, **kwargs):
         raise NotImplementedError()
@@ -29,6 +30,13 @@ class BioentrySearchEngineBackend(object):
 
     def quick_search(self, query):
         raise NotImplementedError()
+
+    def create_loading_Pool(self):
+        self.pool = Pool(processes=getCPUs())
+
+    def add_bioentry_id_to_index(self, counter,bioentry_id):
+        raise NotImplementedError()
+
 
     def map_to_index(self,handler, bioentry_id):
 
@@ -114,7 +122,11 @@ def getCPUs():
     except:
         return 1
 
-
+def picklable_call(instance, name, args=(), kwargs=None):
+    "indirect caller for instance methods and multiprocessing"
+    if kwargs is None:
+        kwargs = {}
+    return getattr(instance, name)(*args, **kwargs)
 
 
 
@@ -254,7 +266,6 @@ class SolrBackend(BioentrySearchEngineBackend):
 
     def __init__(self, handler, url="http://localhost:8983",schema=""):
 
-        from StringIO import StringIO
         self.handler = handler
         self.biodb = handler.adaptor
         self.url = url
@@ -363,6 +374,103 @@ class SolrBackend(BioentrySearchEngineBackend):
         except:
             pass
         return document
+
+
+class ElasticSearchBackend(BioentrySearchEngineBackend):
+    def __init__(self, handler, nodes = [], index_name = 'mybiodb'):
+        self.handler = handler
+        self.biodb = handler.adaptor
+        self.nodes = nodes
+        self.index_name = index_name
+
+    def rebuild(self, bioentry_ids=[], **kwargs):
+        # self.create_loading_Pool()
+
+
+        bioentries =  kwargs.get('bientry_ids',[])
+        if DEBUG: print "starting global index rebuilding"
+        if not bioentries:
+            bioentries = [row.id for row in self.biodb(self.biodb.bioentry.id >0
+                                                      ).select(self.biodb.bioentry.id)]
+        if DEBUG: print "starting indexing of %i bioentries"%len(bioentries)
+        #iterate over all bioentries at 100 max a time
+        # self.pool.apply_async(picklable_call, args = (self, 'add_bioentry_id_to_index',  zip(range(len(bioentries)),bioentries)))
+        # self.pool.close()
+        # self.pool.join()
+        for i,bioentry_id in enumerate(bioentries):
+            self.add_bioentry_id_to_index(i,bioentry_id)
+
+    def add_bioentry_id_to_index(self, counter, bioentry_id):
+
+        if counter%100 ==0 and DEBUG:
+             print "\tadded %i bioentries to index"%counter
+
+        try:
+            self.interface.index(index=self.index_name,
+                            doc_type="full_bioentry",
+                            id=bioentry_id,
+                            body=self.map_to_index(self.handler,bioentry_id)
+                        )
+        except:
+            if DEBUG:
+                print "error building index for id: ",bioentry_id
+                traceback.print_exc()
+
+
+    def search(self, query, **kwargs):
+        if DEBUG:
+            from datetime import datetime
+            start_time = datetime.now()
+        fieldnames =  kwargs.pop('fieldnames', "_all")
+
+        results = self.interface.search(index=self.index_name, body={"query": {
+                                                                            "query_string": {
+                                                                                "query": query},
+                                                                            "term": {
+                                                                                "fields": fieldnames}
+
+                                                                            }})
+
+
+        if DEBUG:
+            print "found %i hits in "%(results['_shards']['successful']), (datetime.now()-start_time)
+        ids = []
+        if results['_shards']['successful']:
+            ids = [r['_id'] for r in results['hits']['hits']]
+
+        return SearchEngineResult(ids, self.handler)
+
+
+    def quick_search(self, query, limit = 0):
+        if limit > 0:
+            return self.search(query,
+                               limit = limit,
+                               fieldnames = ['accession',
+                                               'description',
+                                               'name'],
+                               **{'from':0 })
+        else:
+            return self.search(query,fieldnames = ['accession',
+                                               'description',
+                                               'name'])
+
+    def map_to_index(self, handler, bioentry_id):
+        return super(ElasticSearchBackend, self).map_to_index(handler, bioentry_id)
+
+    def indexes(self, **kwargs):
+        import elasticsearch
+        if self.nodes:
+            try:
+                self.interface = self.interface =  elasticsearch.Elasticsearch(self.nodes, **kwargs)
+            except:
+                raise RuntimeError("Cannot connect to ElasticSearch nodes: %s" % ", ".join(self.nodes))
+        else:
+            try:
+                self.interface =  elasticsearch.Elasticsearch(**kwargs)
+            except:
+                raise RuntimeError("Cannot connect to ElasticSearch on localhost")
+
+
 
 
 class BioentrySearchEngine(object):

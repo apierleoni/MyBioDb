@@ -20,7 +20,7 @@ settings.plugins = []
 
 
 #MyBioDb specific settings
-settings.search_engine = 'whoosh' # available choices: 'whoosh','solr', None
+settings.search_engine = 'elasticsearch' # available choices: 'whoosh','solr', elasticsearch, or None
 settings.solr_uri = 'http://10.25.25.124::8983'
 '''seconds to store a query in cache '''
 settings.search_cache_type = 300

@@ -1,4 +1,4 @@
-from applications.MyBioDb.modules.search_engine import SolrBackend
+from applications.MyBioDb.modules.search_engine import SolrBackend, ElasticSearchBackend
 
 __author__ = 'pierleonia'
 from plugin_haystack import Haystack,WhooshBackend
@@ -16,11 +16,23 @@ import os
 #index_bioentry.indexes('name','description', 'accession', 'identifier' )
 
 # biodb_index = BioentrySearchEngine(biodb_handler,
-#                                    indexdir= os.path.join(request.folder, 'databases'))
+#
+if settings.search_engine == 'elasticsearch':
+    biodb_index = BioentrySearchEngine(biodb_handler,
+                                       backend=ElasticSearchBackend)
 
-biodb_index = BioentrySearchEngine(biodb_handler,
+elif settings.search_engine == 'solr':
+    biodb_index = BioentrySearchEngine(biodb_handler,
                                    backend=SolrBackend,
                                    url="http://localhost:8983/solr",
                                    schema= os.path.join(request.folder, 'static', 'solr', 'schema.xml'))
+elif settings.search_engine == 'whoosh':
+    biodb_index = BioentrySearchEngine(biodb_handler,
+                                        indexdir= os.path.join(request.folder, 'databases'))
 
-biodb_index.indexes()
+if settings.search_engine:
+    biodb_index.indexes()
+
+
+
+
