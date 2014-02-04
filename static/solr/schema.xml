@@ -1,0 +1,33 @@
+<schema name="biosql" version="1.0">
+    <fields>
+        <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+        <field name="db" type="string" indexed="true" stored="true" />
+        <field name="name" type="string" indexed="true" stored="true" />
+        <field name="accession" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="description" type="text" indexed="true" stored="true" />
+        <field name="identifier" type="string" indexed="true" stored="true" />
+        <field name="taxonomy" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="keyword" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="annotation" type="text" indexed="true" stored="true" multiValued="true" />
+        <field name="annotationtype" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="comment" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="feature" type="text" indexed="true" stored="true" multiValued="true" />
+        <field name="featuretype" type="string" indexed="true" stored="true" multiValued="true" />
+        <field name="lenght" type="int" indexed="true" stored="true" />
+        <field name="dbxref" type="string" indexed="true" stored="true"  multiValued="true" />
+        <field name="pubid" type="string" indexed="true" stored="true"  multiValued="true"/>
+        <field name="pubtitle" type="text" indexed="true" stored="true"  multiValued="true"/>
+        <field name="pubauth" type="text" indexed="true" stored="true"  multiValued="true"/>
+        <field name="pubjournal" type="text" indexed="true" stored="true"  multiValued="true"/>
+        <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+     </fields>
+     <defaultSearchField>name</defaultSearchField>
+     <uniqueKey>id</uniqueKey>     
+    <types>
+        <fieldType name="string" class="solr.StrField" />
+        <fieldType name="text" class="solr.TextField" />
+        <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+        <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
+        <fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+    </types>
+</schema>

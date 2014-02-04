@@ -1438,24 +1438,31 @@ class BioSQLHandler(object):
         else:
             self.time_stamps = False
             self.time_stamps_on_biosql = False
-        
+        self.adaptor= DAL(conn_string, pool_size=pool_size)
         try:
-            self.adaptor= DAL(conn_string, pool_size=pool_size)
+
             self._build_model()#builds the web2py model
             self.dbs = dict([(row.name, row.biodatabase_id) for row in self.adaptor(self.adaptor.biodatabase.biodatabase_id > 0).select()])
         except:
-            self.adaptor= DAL(conn_string, pool_size=pool_size)
             self._build_model(create_tables=True)#create new db from scratch
-            self.adaptor= DAL(conn_string, pool_size=pool_size)
-            self._build_model()#builds the web2py model with tables set at migrate = False
+            #self._build_model()#builds the web2py model with tables set at migrate = False
             try:
                 self.dbs = dict([(row.name, row.biodatabase_id) for row in self.adaptor(self.adaptor.biodatabase.biodatabase_id > 0).select()])
             except:
                 self._build_error = True
+
         self.fetch_NCBI_taxonomy = fetch_NCBI_taxonomy
         if self.time_stamps:
-            if not self.time_stamps_on_biosql:
-                self._build_external_time_stamps_table(time_stamps)
+            try:
+                if not self.time_stamps_on_biosql:
+                    self._build_external_time_stamps_table(time_stamps)
+                else:
+                    self._build_internal_time_stamps_table()
+            except Exception, e:
+                if not self.time_stamps_on_biosql:
+                    self._build_external_time_stamps_table(time_stamps,create_tables=True)
+                else:
+                    self._build_internal_time_stamps_table(create_tables=True)
 
         
     def set_db(self,dbname):
@@ -1524,7 +1531,7 @@ class BioSQLHandler(object):
     
     
 
-    def _build_external_time_stamps_table(self, time_stamps):
+    def _build_external_time_stamps_table(self, time_stamps, create_tables = False):
         
         self.timestampsdb = DAL(time_stamps, pool_size=5)
         table_name = 'bioentry_timestamp'
@@ -1533,7 +1540,32 @@ class BioSQLHandler(object):
             Field('created_by', default = current_user,),# writable = False),
             Field('created_on','datetime', default = now,),# writable = False) ,
             Field('modified_by', default = current_user, ),# writable = False),
-            Field('modified_on','datetime', default = now, ))# writable = False),)
+            Field('modified_on','datetime', default = now, ),# writable = False),)
+            create_tables = create_tables,
+            )
+        if create_tables:
+            self.timestampsdb.executesql('''CREATE INDEX timestampbioentry ON bioentry_timestamp(bioentry_id);''')
+            self.timestampsdb.executesql('''CREATE INDEX timestampcreateby ON bioentry_timestamp(created_by);''')
+            self.timestampsdb.executesql('''CREATE INDEX timestampmodifyby ON bioentry_timestamp(modified_by);''')
+
+    def _build_internal_time_stamps_table(self, create_tables = False):
+
+        self.timestampsdb = self.adaptor
+        table_name = 'bioentry_timestamp'
+        self.adaptor.define_table(table_name,
+                Field('bioentry_id','integer', unique = True, requires=IS_IN_DB(self.adaptor,'bioentry.bioentry_id','bioentry.name'), ondelete='CASCADE'),
+                Field('created_by', default = current_user,),# writable = False),
+                Field('created_on','datetime', default = now,),# writable = False) ,
+                Field('modified_by', default = current_user, ),# writable = False),
+                Field('modified_on','datetime', default = now, ),# writable = False),
+                migrate = create_tables,# you need write access to use timestamps
+                )
+        if create_tables:
+            self.adaptor.executesql('''CREATE INDEX timestampbioentry ON bioentry_timestamp(bioentry_id);''')
+            self.adaptor.executesql('''CREATE INDEX timestampcreateby ON bioentry_timestamp(created_by);''')
+            self.adaptor.executesql('''CREATE INDEX timestampmodifyby ON bioentry_timestamp(modified_by);''')
+
+
 
     def _build_model(self, create_tables = False, FAKE_MIGRATE  = False ):
         '''BioSQL db model
@@ -1791,17 +1823,6 @@ class BioSQLHandler(object):
             self.adaptor.executesql('''CREATE INDEX bioentry_tax ON bioentry (taxon_id);''')
             self.adaptor.executesql('''CREATE INDEX bioentry_db ON bioentry (biodatabase_id);''')
 
-            
-        if self.time_stamps_on_biosql:
-            table_name = 'bioentry_timestamp'
-            self.adaptor.define_table(table_name,
-                Field('bioentry_id','reference bioentry',  unique = True, requires = IS_IN_DB(self.adaptor,'bioentry.bioentry_id','bioentry.name')),
-                Field('created_by', default = current_user,),# writable = False),
-                Field('created_on','datetime', default = now,),# writable = False) ,
-                Field('modified_by', default = current_user, ),# writable = False),
-                Field('modified_on','datetime', default = now, ),# writable = False),
-                migrate = create_tables,# you need write access to use timestamps
-                sequence_name = get_sequence_name(table_name))
 
         table_name = 'bioentry_relationship'
         self.adaptor.define_table(table_name,

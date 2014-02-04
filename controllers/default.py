@@ -13,15 +13,15 @@ def index():
 
 def error():
     return dict()
-    
+
 def _get_uniprot_xml(uniprot_id):
     import urllib
-    from Bio.SeqIO.UniprotIO import UniprotIterator 
-    seqrec = cache.disk(str('%s-uniprotxml'%uniprot_id), 
-                        lambda: UniprotIterator(urllib.urlopen('http://www.ebi.ac.uk/Tools/webservices/rest/dbfetch/uniprotkb/%s/uniprotxml'%uniprot_id),).next(), 
+    from Bio.SeqIO.UniprotIO import UniprotIterator
+    seqrec = cache.disk(str('%s-uniprotxml'%uniprot_id),
+                        lambda: UniprotIterator(urllib.urlopen('http://www.ebi.ac.uk/Tools/webservices/rest/dbfetch/uniprotkb/%s/uniprotxml'%uniprot_id),).next(),
                         time_expire=180000)#cache on disk for two days (more or less)
     return seqrec #returns a StringIO handler
-    
+
 def uniprot_remote_load():
     form=FORM('Please input a UniProt ID to load:',
               INPUT(_name = 'uniprot_id'),
@@ -36,31 +36,6 @@ def uniprot_remote_load():
             response.flash = 'Error: %s'%e.message
     return dict(form = form, )
 
-
-def local_import_huge():
-    '''used to quickly load a big db for testing'''
-    created_seqrec = []
-    errors =[]
-    i= 0
-    from Bio import SeqIO
-    for seqrec in SeqIO.parse('/Users/pierleonia/Downloads/uniprot/uniprot_sprot.xml', 'uniprot-xml'):
-        i+=1
-        print 'uploading entry ', i,  #used for debug remove in production code
-        if i< settings.max_entry_load:
-            try:
-                created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = 'UniProt')
-                created_seqrec.append((seqrec.id, created_seqrec_id))
-                print ' -> SUCCESS'
-            except Exception, e:
-                print ' -> ERROR:', e
-                errors.append((seqrec.id, e))
-            if i%100 == 0:
-                biodb.commit()
-        else:
-            break
-
-    print  '%i entries correctly loaded on db'%len(created_seqrec),
-    print '| %i errors while loading'%len(errors)
 
 
 def import_entry():
@@ -120,12 +95,7 @@ def import_entry():
     return dict(form = form)
     
 
-def view_uniprot_entries():
-    returnul = UL()
-    for row in biodb(biodb.bioentry.id>0).select():
-        returnul.append(LI(A(row.name,_href = URL(r=request, f = view, vars = dict(bioentry_id = row.id )))))
-     
-    return dict(returnul = returnul)
+
    
 def input_error_redirect(error):
     session.flash = str(error)

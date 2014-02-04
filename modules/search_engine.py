@@ -34,9 +34,8 @@ class BioentrySearchEngineBackend(object):
     def create_loading_Pool(self):
         self.pool = Pool(processes=getCPUs())
 
-    def add_bioentry_id_to_index(self, counter,bioentry_id):
+    def add_bioentry_id_to_index(self, bioentry_id, counter = 1):
         raise NotImplementedError()
-
 
     def map_to_index(self,handler, bioentry_id):
 
@@ -394,13 +393,13 @@ class ElasticSearchBackend(BioentrySearchEngineBackend):
                                                       ).select(self.biodb.bioentry.id)]
         if DEBUG: print "starting indexing of %i bioentries"%len(bioentries)
         #iterate over all bioentries at 100 max a time
-        # self.pool.apply_async(picklable_call, args = (self, 'add_bioentry_id_to_index',  zip(range(len(bioentries)),bioentries)))
+        # self.pool.apply_async(picklable_call, args = (self, 'add_bioentry_id_to_index',  zip(bioentries, range(len(bioentries)))))
         # self.pool.close()
         # self.pool.join()
         for i,bioentry_id in enumerate(bioentries):
-            self.add_bioentry_id_to_index(i,bioentry_id)
+            self.add_bioentry_id_to_index(bioentry_id, i)
 
-    def add_bioentry_id_to_index(self, counter, bioentry_id):
+    def add_bioentry_id_to_index(self, bioentry_id, counter = 1):
 
         if counter%100 ==0 and DEBUG:
              print "\tadded %i bioentries to index"%counter
@@ -422,20 +421,23 @@ class ElasticSearchBackend(BioentrySearchEngineBackend):
             from datetime import datetime
             start_time = datetime.now()
         fieldnames =  kwargs.pop('fieldnames', "_all")
+        size = kwargs.pop('limit', 100)
+        from_ = kwargs.pop('from', 0)
 
-        results = self.interface.search(index=self.index_name, body={"query": {
-                                                                            "query_string": {
-                                                                                "query": query},
-                                                                            "term": {
-                                                                                "fields": fieldnames}
-
-                                                                            }})
-
+        # results = self.interface.search(index=self.index_name, body={"query": {"query_string": {
+        #                                                                             "query": query},
+        #                                                                         "term": {
+        #                                                                             "fields": fieldnames},
+        #
+        #                                                                          'from': from_arg,
+        #                                                                          'size' : size
+        #                                                              }})
+        results = self.interface.search(index=self.index_name, q= query, from_ =from_, size = size, fields = fieldnames )
 
         if DEBUG:
-            print "found %i hits in "%(results['_shards']['successful']), (datetime.now()-start_time)
+            print "found %i hits in %ims"%(results['hits']['total'], results['took'])
         ids = []
-        if results['_shards']['successful']:
+        if results['hits']['total']:
             ids = [r['_id'] for r in results['hits']['hits']]
 
         return SearchEngineResult(ids, self.handler)
@@ -444,7 +446,7 @@ class ElasticSearchBackend(BioentrySearchEngineBackend):
     def quick_search(self, query, limit = 0):
         if limit > 0:
             return self.search(query,
-                               limit = limit,
+                               size = limit,
                                fieldnames = ['accession',
                                                'description',
                                                'name'],
@@ -492,3 +494,5 @@ class BioentrySearchEngine(object):
         return self.backend.search(query, **kwargs)
     def quick_search(self, query, limit = 0):
         return self.backend.quick_search(query, limit)
+    def add_bioentry_id_to_index(self, bioentry_id):
+        return self.backend.add_bioentry_id_to_index(bioentry_id)
