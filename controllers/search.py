@@ -185,10 +185,29 @@ def search_handler():
     if result_count:
         if result_count > settings.max_query_results:
             response.flash= '''WARNING: you query retrieved %i results, but only the first %i will be displayed. Please narrow your search to see other results'''%(result_count,settings.max_query_results)
-        data.extend(get_search_result_table_from_ids(result_sql))
+        try:
+            data.extend(get_search_result_table_from_search_engine(search_result.data))
+        except:
+            data.extend(get_search_result_table_from_ids(result_sql))
 
 
     return dict(aaData = data)
+
+
+
+
+def get_search_result_table_from_search_engine(search_engine_data):
+    data = []
+    bioentry_link = URL(r=request, c = 'default', f= 'view.html', vars=dict(bioentry_id = ''))# define just once for speed improvement
+
+    for data_point in search_engine_data:
+        data.append([A(data_point['name'],
+            _href = bioentry_link+str(data_point['id']),
+            _class = 'label'),
+                     data_point['accession'],
+                     data_point['description']])
+
+    return data
 
 
 def get_search_result_table_from_ids(sql_query):

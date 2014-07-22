@@ -105,14 +105,14 @@ class BioentrySearchEngineBackend(object):
 
 
 class SearchEngineResult(object):
-    def __init__(self, ids, handler):
+    def __init__(self, ids, handler, data = {}):
 
         self.biodb = handler.adaptor
         self.db_query = self.biodb.bioentry._id.belongs(ids) # to be used in DAL queries
         self.selected_ids = ids
         self.count = len(ids)
         self.select_sql = self.biodb(self.biodb.bioentry.id.belongs(ids))._select() #raw sql to retrieve data from the bioentry table
-
+        self.data = data
 
 def getCPUs():
     import multiprocessing
@@ -432,15 +432,28 @@ class ElasticSearchBackend(BioentrySearchEngineBackend):
         #                                                                          'from': from_arg,
         #                                                                          'size' : size
         #                                                              }})
-        results = self.interface.search(index=self.index_name, q= query, from_ =from_, size = size, fields = fieldnames )
+        results = self.interface.search(index=self.index_name,
+                                        q= query,
+                                        from_ =from_,
+                                        size = size,
+                                        #fields = fieldnames,#TODO: should be the list of fields to return, check!
+                                        _source_include = ['id','name','accession','description'])
 
         if DEBUG:
             print "found %i hits in %ims"%(results['hits']['total'], results['took'])
         ids = []
-        if results['hits']['total']:
-            ids = [r['_id'] for r in results['hits']['hits']]
+        data = []
 
-        return SearchEngineResult(ids, self.handler)
+        if results['hits']['total']:
+            for r in results['hits']['hits']:
+
+                ids = r['_id']
+                data.append(  dict( id = r['_source']['id'],
+                                    name = r['_source']['name'],
+                                    accession = r['_source']['accession'][0],
+                                    description = r['_source']['description']))
+
+        return SearchEngineResult(ids, self.handler, data)
 
 
     def quick_search(self, query, limit = 0):

@@ -98,7 +98,7 @@ td.w2p_fl, td.w2p_fc { padding-top: 4px; }
 #auth_user_remember__row label {display: inline;}
 #web2py_user_form td { vertical-align:top; }
 
-a, a:visited, a:hover { color:#0069D6}
+/*a, a:visited, a:hover { color:#0069D6}*/
 
 /*********** web2py specific ***********/
 div.flash {

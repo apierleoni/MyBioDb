@@ -5,10 +5,13 @@
 <small>{{=response.subtitle or ''}}</small>
 {{end}}
 
-<p class = "alert"> <strong>TEMPORARY:</strong> This is a temporary index page, just to develp</p>
-{{= DIV(UL(
-        LI(A('Load an entry form local file', _href = URL(r = request, f = 'import_entry'))),
-        LI(A('Load an entry remotely from UniProt', _href = URL(r = request, f = 'uniprot_remote_load'))),
-        LI(A('View loaded entries', _href = URL(r = request, f = 'view_uniprot_entries'))),
-        ))
-}}
+<p class = "alert"> <strong>TEMPORARY:</strong> This is a temporary index page to be used for dev work</p>
+<p class = "text text-success"> Entries in the database <span class="label label-success"> {{=biodb(biodb.bioentry.id>0).count()}}</span> </p>
+<p class = "text text-info"> Database engine in use: <span class="label label-info">{{= settings.biodb_conn_string.split(':')[0]}} </span></p>
+<p class = "text text-info"> Search engine in use: <span class="label label-info">{{= settings.search_engine}} </span> </p>
+<div>
+    <h3>Actions</h3>
+    <a href="{{=URL(r = request, f = 'import_entry')}}" class="btn btn-primary btn-large"><i class="icon-white icon-upload"></i> Upload entries form local file</a>
+    <a href="{{=URL(r = request, f = 'uniprot_remote_load')}}" class="btn btn-primary btn-large"><i class="icon-white icon-download"></i> Download entries form remote repository</a>
+
+</div>

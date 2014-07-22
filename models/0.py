@@ -20,8 +20,11 @@ settings.plugins = []
 
 
 #MyBioDb specific settings
+settings.biodb_conn_string = 'mysql://root:@127.0.0.1/mybiodb'
+settings.timestamps_db = 'mysql://root:@127.0.0.1/mybiodb'
 settings.search_engine = 'elasticsearch' # available choices: 'whoosh','solr', elasticsearch, or None
-settings.solr_uri = 'http://10.25.25.124::8983'
+settings.solr_uri = 'http:/localhost:8983'
+settings.solr_uri = 'http:/localhost:9200'
 '''seconds to store a query in cache '''
 settings.search_cache_type = 300
 '''maximum number of results to report upon a search '''

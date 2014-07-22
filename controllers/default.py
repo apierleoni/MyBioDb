@@ -169,8 +169,8 @@ def view():
                         _id="export-dropdown", _class="dropdown-menu"))
     toolbar.append(toolbar_g2)
 
-    main_content.append(H3('DB TIMINGS'))
-    main_content.append(DIV(BEAUTIFY(sorted(biodb._timings, key=lambda timing: timing[1])), _class = 'alert alert-info'))
+    # main_content.append(H3('DB TIMINGS'))
+    # main_content.append(DIV(BEAUTIFY(sorted(biodb._timings, key=lambda timing: timing[1])), _class = 'alert alert-info'))
 
     return dict(main_content = main_content,
                 bioentry_id = bioentry_id,

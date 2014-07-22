@@ -17,7 +17,7 @@ def rebuild_index():
 
 def local_import_huge():
     '''used to quickly load a big db for testing'''
-    import traceback
+    import traceback,time
     created_seqrec = []
     errors =[]
     i= 0
@@ -25,13 +25,14 @@ def local_import_huge():
     for seqrec in SeqIO.parse('/Users/pierleonia/Downloads/uniprot/uniprot_sprot.xml', 'uniprot-xml'):
         i+=1
         print 'uploading entry ', i,  #used for debug remove in production code
-        if i< settings.max_entry_load:
+        if 437590<i< settings.max_entry_load:
+            start_time = time.time()
             try:
                 created_seqrec_id = biodb_handler.load_seqrecord(seqrec, db = 'UniProt')
                 created_seqrec.append((seqrec.id, created_seqrec_id))
                 biodb.commit()
                 biodb_index.add_bioentry_id_to_index(created_seqrec_id)
-                print ' -> SUCCESS'
+                print ' -> SUCCESS in ', int(round(time.time() - start_time, 3)*1000), 'ms'
             except Exception, e:
                 print ' -> ERROR:', e
                 errors.append((seqrec.id, e))
