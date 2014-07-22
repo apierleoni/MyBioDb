@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> <!-- 33 KB -->
+    <link  href="http://fotorama.s3.amazonaws.com/4.5.2/fotorama.css" rel="stylesheet"> <!-- 3 KB -->
+    <script src="http://fotorama.s3.amazonaws.com/4.5.2/fotorama.js"></script> <!-- 16 KB -->
+
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -39,55 +43,91 @@
           <li><a href="https://github.com/apierleoni/MyBioDb/tarball/master">Download <strong>TAR Ball</strong></a></li>
           <li><a href="https://github.com/apierleoni/MyBioDb">View On <strong>GitHub</strong></a></li>
         </ul>
+        <h2>Screenshots</h2>
+        <div class="fotorama"
+             data-allowfullscreen="true"
+             data-autoplay="true"
+             data-loop="true">
+            <img src="images/1_home_page.png" data-caption="Home page">
+            <img src="images/2_search_box.png" data-caption="Search box">
+            <img src="images/3_search_results.png" data-caption="Search results">
+            <img src="images/4_in_page_search_result_filter.png" data-caption="In page search result filter">
+            <img src="images/5_view_bioentry_general_info_and_qualifiers.png" data-caption="View bioentry general info and qualifiers">
+            <img src="images/6_filter_qualifiers.png" data-caption="Filter qualifiers">
+            <img src="images/7_view_sequence.png" data-caption="View sequence">
+            <img src="images/8_view_features.png" data-caption="View features">
+            <img src="images/9_view_feature_on_sequence_and filter.png" data-caption="View feature on sequence and filter">
+            <img src="images/10_view_cross_references.png" data-caption="View cross references">
+            <img src="images/11_filter_cross_references.png" data-caption="Filter cross references">
+            <img src="images/12_view_references.png" data-caption="View references">
+            <img src="images/13_retrieve_abstract_and_mesh_terms_from_pubmed.png" data-caption="Retrieve abstract and mesh terms from pubmed">
+            <img src="images/14_export_bioentry_to_local_file.png" data-caption="Export bioentry to local file">
+            <img src="images/15_activate_edit_view.png" data-caption="Activate edit view">
+            <img src="images/16_edit_name.png" data-caption="Edit name">
+            <img src="images/17_edit_description.png" data-caption="Edit description">
+            <img src="images/18_edit_qualifier_value.png" data-caption="Edit qualifier value">
+            <img src="images/19_edit_long_qualifier_value.png" data-caption="Edit long qualifier value">
+            <img src="images/20_features_edit_view.png" data-caption="Features edit view">
+            <img src="images/21_edit_feature_type.png" data-caption="Edit feature type">
+            <img src="images/22_edit_feature_position.png" data-caption="Edit feature position">
+            <img src="images/23_add_feature_and_view_on_sequence.png" data-caption="Add feature and view on sequence">
+            <img src="images/24_delete_feature.png" data-caption="Delete feature">
+            <img src="images/25_edit_cross_reference.png" data-caption="Edit cross reference">
+            <img src="images/26_add_reference_from_pubmed.png" data-caption="Add reference from pubmed">
+
+
+        </div>
       </header>
       <section>
         <h1>MyBioDb</h1>
 
-<p>A fully featured Biological database webapp based on:</p>
+        <p>A fully featured Biological database webapp based on:</p>
 
-<ul>
-<li>your BioSQL database</li>
-<li>BioPython</li>
-<li>web2py</li>
-<li>bootstrap and JQuery</li>
-<li>whoosh or solr if you want to index the database</li>
-</ul>
-
-
-<h2>Install</h2>
-<ul>
-<li>clone this repo into a web2py application folder</li>
-<li>launch web2py: <code>python web2py.py</code>
-</li>
-<li>if running locally go to <a href="http://localhost:8000/MyBioDb">http://localhost:8000/MyBioDb</a>
-</li>
-<li>enjoy</li>
-</ul>
-
-<h2>What can you do with MyBioDb?</h2>
-<ul>
-<li>load entries (from local or remote source) in any BioPython supported format to a BioSQL database</li>
-<li>view each entry with full CRUD options</li>
-<li>search the db with simple or complex queries</li>
-<li>full indexed data with whoosh (default and portable), solr, elasticsearch (recommended)</li>
-<li>full auth support for editing and search results (private and public entries)</li>
-<li>entry versioning</li>
-<li>admin page for management</li>
-</ul>
+        <ul>
+        <li>your BioSQL database</li>
+        <li>BioPython</li>
+        <li>web2py</li>
+        <li>bootstrap and JQuery</li>
+        <li>whoosh or solr if you want to index the database</li>
+        </ul>
 
 
-<h2>How can I use it with my BioSQL db?</h2>
-<ul>
-<li>edit the connection string on <code>/modules/biodb.py</code></li>
-<li>currently tested with SQLite and MySQL, has some issue with postgres</li>
-</ul>
+        <h2>Install</h2>
+        <ul>
+        <li>clone this repo into a web2py application folder</li>
+        <li>launch web2py: <code>python web2py.py</code>
+        </li>
+        <li>if running locally go to <a href="http://localhost:8000/MyBioDb">http://localhost:8000/MyBioDb</a>
+        </li>
+        <li>enjoy</li>
+        </ul>
 
-<h2>What if I don't have a BioSQL db? Wait, what is a BioSQL db?</h2>
-<ul>
-<li>take a look at <a href = "http://www.biosql.org/wiki/Main_Page">this</a></li>
-<li>don't worry MyBioDb will create a BioSQL database for you (but depending on the backend you use it could be not 100% identical to one created with the offical BioSQL sql)</li>
-<li>by default MyBioDb will use a local SQLite db </li>
-</ul>
+        <h2>What can you do with MyBioDb?</h2>
+        <ul>
+        <li>load entries (from local or remote source) in any BioPython supported format to a BioSQL database</li>
+        <li>view each entry with full CRUD options</li>
+        <li>search the db with simple or complex queries</li>
+        <li>full indexed data with whoosh (default and portable), solr, elasticsearch (recommended)</li>
+        <li>full auth support for editing and search results (private and public entries)</li>
+        <li>entry versioning</li>
+        <li>admin page for management</li>
+        </ul>
+
+
+        <h2>How can I use it with my BioSQL db?</h2>
+        <ul>
+        <li>edit the connection string on <code>/modules/biodb.py</code></li>
+        <li>currently tested with SQLite and MySQL, has some issue with postgres</li>
+        </ul>
+
+        <h2>What if I don't have a BioSQL db? Wait, what is a BioSQL db?</h2>
+        <ul>
+        <li>take a look at <a href = "http://www.biosql.org/wiki/Main_Page">this</a></li>
+        <li>don't worry MyBioDb will create a BioSQL database for you (but depending on the backend you use it could be not 100% identical to one created with the offical BioSQL sql)</li>
+        <li>by default MyBioDb will use a local SQLite db </li>
+
+
+        </ul>
 
       </section>
       <footer>
